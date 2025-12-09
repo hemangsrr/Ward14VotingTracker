@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = ['*']
 
 # Add WhiteNoise middleware for static file serving
 MIDDLEWARE = [
@@ -49,17 +49,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 MEDIA_ROOT = '/app/media'
 MEDIA_URL = '/media/'
 
-# CORS settings for production
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost',
-    'http://127.0.0.1',
-]
-
-# Add your production domain when deployed
-if not DEBUG:
-    CORS_ALLOWED_ORIGINS.extend([
-        os.environ.get('FRONTEND_URL', 'http://localhost'),
-    ])
+# CORS settings for production - Allow all origins
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 # Security settings for production
 if not DEBUG:

@@ -8,6 +8,9 @@ router.register(r'voters', views.VoterViewSet, basename='voter')
 router.register(r'volunteers', views.VolunteerViewSet, basename='volunteer')
 
 urlpatterns = [
+    # Health check
+    path('health/', views.health_check, name='health-check'),
+    
     # Authentication endpoints
     path('auth/login/', views.login_view, name='login'),
     path('auth/logout/', views.logout_view, name='logout'),

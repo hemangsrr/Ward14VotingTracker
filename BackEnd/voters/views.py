@@ -66,7 +66,7 @@ def csrf_token_view(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def app_settings_view(request):
     """Get application settings"""
     settings = AppSettings.load()
@@ -74,6 +74,16 @@ def app_settings_view(request):
         'voting_enabled': settings.voting_enabled,
         'updated_at': settings.updated_at
     })
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def health_check(request):
+    """Health check endpoint for deployment platforms"""
+    return Response({
+        'status': 'healthy',
+        'service': 'Ward 14 Voting Tracker'
+    }, status=status.HTTP_200_OK)
 
 
 # Voter ViewSet
