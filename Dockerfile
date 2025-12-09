@@ -49,10 +49,9 @@ RUN mkdir -p /app/staticfiles /app/media /var/log/supervisor /var/run/postgresql
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /app/entrypoint.sh
-COPY docker/init-db.sh /app/init-db.sh
 
 # Make scripts executable
-RUN chmod +x /app/entrypoint.sh /app/init-db.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Expose port
 EXPOSE 80
