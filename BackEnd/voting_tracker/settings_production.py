@@ -61,17 +61,20 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Session and Cookie settings for production
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'None'  # Required for cross-origin requests
+CSRF_COOKIE_SAMESITE = 'None'  # Required for cross-origin requests
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False  # Must be False for JavaScript to read it
 SESSION_COOKIE_SECURE = True  # Required for HTTPS
 CSRF_COOKIE_SECURE = True  # Required for HTTPS
+SESSION_COOKIE_DOMAIN = None  # Let Django handle domain automatically
+CSRF_COOKIE_DOMAIN = None
 
 # Security settings for production
+SECURE_SSL_REDIRECT = False  # DigitalOcean handles SSL at load balancer
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Trust DigitalOcean proxy
+
 if not DEBUG:
-    SECURE_SSL_REDIRECT = False  # DigitalOcean handles SSL at load balancer
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Trust DigitalOcean proxy
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'SAMEORIGIN'
