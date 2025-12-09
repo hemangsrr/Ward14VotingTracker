@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-DOCKERHUB_USERNAME="${DOCKERHUB_USERNAME:-your-dockerhub-username}"
+DOCKERHUB_USERNAME="${DOCKERHUB_USERNAME:-hemangsrr}"
 IMAGE_NAME="voting-tracker"
 VERSION="${VERSION:-latest}"
 
