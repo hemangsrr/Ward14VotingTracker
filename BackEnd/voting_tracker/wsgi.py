@@ -12,6 +12,6 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 # Use production settings in Docker, development settings otherwise
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "voting_tracker.settings_production")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "voting_tracker.settings_droplet")
 
 application = get_wsgi_application()
