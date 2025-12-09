@@ -9,7 +9,12 @@ export const VoterDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
+  
+  // Check if user is Level 1 volunteer (read-only)
+  const isLevel1 = user?.volunteer?.level === 'level1';
+  const isLevel2 = user?.volunteer?.level === 'level2';
+  const isReadOnly = isLevel1;
   
   const [voter, setVoter] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -131,14 +136,16 @@ export const VoterDetailPage = () => {
           {language === 'en' ? 'Back to List' : 'ലിസ്റ്റിലേക്ക് മടങ്ങുക'}
         </button>
         
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Save className="w-4 h-4" />
-          {saving ? (language === 'en' ? 'Saving...' : 'സംരക്ഷിക്കുന്നു...') : (language === 'en' ? 'Save Changes' : 'മാറ്റങ്ങൾ സംരക്ഷിക്കുക')}
-        </button>
+        {!isReadOnly && (
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Save className="w-4 h-4" />
+            {saving ? (language === 'en' ? 'Saving...' : 'സംരക്ഷിക്കുന്നു...') : (language === 'en' ? 'Save Changes' : 'മാറ്റങ്ങൾ സംരക്ഷിക്കുക')}
+          </button>
+        )}
       </div>
 
       {/* Success Message */}
@@ -239,7 +246,8 @@ export const VoterDetailPage = () => {
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  disabled={isReadOnly}
+                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="active">{language === 'en' ? 'Active' : 'സജീവം'}</option>
                   <option value="out_of_station">{language === 'en' ? 'Out of Station' : 'സ്റ്റേഷനു പുറത്ത്'}</option>
@@ -248,21 +256,37 @@ export const VoterDetailPage = () => {
                 </select>
               </div>
 
-              {/* Party */}
+              {/* Party/Division */}
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  {language === 'en' ? 'Party' : 'പാർട്ടി'}
+                  {isAdmin 
+                    ? (language === 'en' ? 'Party' : 'പാർട്ടി')
+                    : (language === 'en' ? 'Division' : 'ഡിവിഷൻ')
+                  }
                 </label>
                 <select
                   value={party}
                   onChange={(e) => setParty(e.target.value)}
-                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  disabled={isReadOnly}
+                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="ldf">LDF</option>
-                  <option value="udf">UDF</option>
-                  <option value="bjp">BJP</option>
-                  <option value="other">{language === 'en' ? 'Other' : 'മറ്റുള്ളവ'}</option>
-                  <option value="unknown">{language === 'en' ? 'Unknown' : 'അറിയില്ല'}</option>
+                  {isAdmin ? (
+                    <>
+                      <option value="ldf">LDF</option>
+                      <option value="udf">UDF</option>
+                      <option value="bjp">BJP</option>
+                      <option value="other">{language === 'en' ? 'Other' : 'മറ്റുള്ളവ'}</option>
+                      <option value="unknown">{language === 'en' ? 'Unknown' : 'അറിയില്ല'}</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="ldf">Division A</option>
+                      <option value="udf">Division B</option>
+                      <option value="bjp">Division C</option>
+                      <option value="other">Division D</option>
+                      <option value="unknown">-</option>
+                    </>
+                  )}
                 </select>
               </div>
 
@@ -273,7 +297,7 @@ export const VoterDetailPage = () => {
                     type="checkbox"
                     checked={hasVoted}
                     onChange={(e) => setHasVoted(e.target.checked)}
-                    disabled={!votingEnabled}
+                    disabled={isReadOnly || !votingEnabled}
                     className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   <span className="text-sm font-medium">
@@ -301,6 +325,7 @@ export const VoterDetailPage = () => {
                   type="tel"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
+                  disabled={isReadOnly}
                   placeholder={language === 'en' ? 'Enter phone number' : 'ഫോൺ നമ്പർ നൽകുക'}
                   className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
@@ -314,9 +339,10 @@ export const VoterDetailPage = () => {
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
+                  disabled={isReadOnly}
                   placeholder={language === 'en' ? 'Add any notes...' : 'കുറിപ്പുകൾ ചേർക്കുക...'}
                   rows={4}
-                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
             </div>

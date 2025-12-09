@@ -1,21 +1,52 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { votersAPI } from '@/services/api';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Search, Filter, CheckCircle, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Search, Filter, CheckCircle, XCircle, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 
 export const VotersPage = () => {
   const { language } = useLanguage();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [voters, setVoters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastRefresh, setLastRefresh] = useState(new Date());
+  const refreshIntervalRef = useRef(null);
   
-  // Filters
+  // Check if user is Level 1 volunteer (read-only)
+  const isLevel1 = user?.volunteer?.level === 'level1';
+  const isLevel2 = user?.volunteer?.level === 'level2';
+  const isReadOnly = isLevel1;
+  
+  // Filters - Default to LDF/Division A and not voted for volunteers
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterVoted, setFilterVoted] = useState('all');
-  const [filterParty, setFilterParty] = useState('all');
+  const [filterVoted, setFilterVoted] = useState(isAdmin ? 'all' : 'not_voted');
+  const [filterParty, setFilterParty] = useState(isAdmin ? 'all' : 'ldf'); // ldf = Division A
   const [filterStatus, setFilterStatus] = useState('all');
+  
+  // Division mapping for volunteers (hide actual party names)
+  const getDivisionLabel = (partyCode) => {
+    const divisionMap = {
+      'ldf': 'A',
+      'udf': 'B',
+      'bjp': 'C',
+      'other': 'D',
+      'unknown': '-'
+    };
+    return divisionMap[partyCode] || partyCode;
+  };
+  
+  const getPartyLabel = (partyCode) => {
+    if (isAdmin) {
+      // Admin sees actual party names
+      return partyCode.toUpperCase();
+    } else {
+      // Volunteers see division codes
+      return getDivisionLabel(partyCode);
+    }
+  };
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,6 +55,23 @@ export const VotersPage = () => {
   useEffect(() => {
     fetchVoters();
   }, [searchQuery, filterVoted, filterParty, filterStatus, currentPage]);
+
+  // Auto-refresh for Level 1 volunteers every 5 minutes
+  useEffect(() => {
+    if (isLevel1) {
+      // Set up auto-refresh every 5 minutes (300000 ms)
+      refreshIntervalRef.current = setInterval(() => {
+        fetchVoters();
+        setLastRefresh(new Date());
+      }, 300000);
+
+      return () => {
+        if (refreshIntervalRef.current) {
+          clearInterval(refreshIntervalRef.current);
+        }
+      };
+    }
+  }, [isLevel1, searchQuery, filterVoted, filterParty, filterStatus, currentPage]);
 
   const fetchVoters = async () => {
     try {
@@ -90,7 +138,7 @@ export const VotersPage = () => {
     
     return (
       <span className={`px-2 py-1 rounded text-xs font-medium ${partyColors[party] || 'bg-gray-100 text-gray-800'}`}>
-        {party.toUpperCase()}
+        {getPartyLabel(party)}
       </span>
     );
   };
@@ -98,13 +146,28 @@ export const VotersPage = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-primary">
-          {language === 'en' ? 'All Voters' : 'എല്ലാ വോട്ടർമാരും'}
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          {language === 'en' ? 'Complete voter list with filtering' : 'ഫിൽട്ടറിംഗ് സഹിതം പൂർണ്ണ വോട്ടർ ലിസ്റ്റ്'}
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-primary">
+            {isAdmin 
+              ? (language === 'en' ? 'All Voters' : 'എല്ലാ വോട്ടർമാരും')
+              : (language === 'en' ? 'My Voters' : 'എന്റെ വോട്ടർമാർ')
+            }
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            {isReadOnly && (
+              <span className="inline-flex items-center gap-2 text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
+                <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                {language === 'en' ? 'View Only Mode' : 'കാണാൻ മാത്രം'}
+              </span>
+            )}
+            {isLevel1 && (
+              <span className="ml-2 text-xs text-muted-foreground">
+                {language === 'en' ? `Auto-refreshes every 5 min • Last: ${lastRefresh.toLocaleTimeString()}` : `ഓട്ടോ-റിഫ്രഷ് 5 മിനിറ്റിൽ`}
+              </span>
+            )}
+          </p>
+        </div>
       </div>
 
       {/* Filters */}
@@ -116,7 +179,7 @@ export const VotersPage = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
-                placeholder={language === 'en' ? 'Search by name, SEC ID...' : 'പേര്, SEC ID കൊണ്ട് തിരയുക...'}
+                placeholder={language === 'en' ? 'Search by name, house name, serial no...' : 'പേര്, വീട്ടുപേര്, സീരിയൽ നമ്പർ...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -135,18 +198,31 @@ export const VotersPage = () => {
             <option value="not_voted">{language === 'en' ? 'Not Voted' : 'വോട്ട് ചെയ്യാത്തവർ'}</option>
           </select>
 
-          {/* Party Filter */}
+          {/* Party/Division Filter */}
           <select
             value={filterParty}
             onChange={(e) => setFilterParty(e.target.value)}
             className="px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           >
-            <option value="all">{language === 'en' ? 'All Parties' : 'എല്ലാ പാർട്ടികളും'}</option>
-            <option value="ldf">LDF</option>
-            <option value="udf">UDF</option>
-            <option value="bjp">BJP</option>
-            <option value="other">{language === 'en' ? 'Other' : 'മറ്റുള്ളവ'}</option>
-            <option value="unknown">{language === 'en' ? 'Unknown' : 'അറിയില്ല'}</option>
+            {isAdmin ? (
+              <>
+                <option value="all">{language === 'en' ? 'All Parties' : 'എല്ലാ പാർട്ടികളും'}</option>
+                <option value="ldf">LDF</option>
+                <option value="udf">UDF</option>
+                <option value="bjp">BJP</option>
+                <option value="other">{language === 'en' ? 'Other' : 'മറ്റുള്ളവ'}</option>
+                <option value="unknown">{language === 'en' ? 'Unknown' : 'അറിയില്ല'}</option>
+              </>
+            ) : (
+              <>
+                <option value="all">{language === 'en' ? 'All Divisions' : 'എല്ലാ ഡിവിഷനുകളും'}</option>
+                <option value="ldf">Division A</option>
+                <option value="udf">Division B</option>
+                <option value="bjp">Division C</option>
+                <option value="other">Division D</option>
+                <option value="unknown">-</option>
+              </>
+            )}
           </select>
 
           {/* Status Filter */}
@@ -195,7 +271,10 @@ export const VotersPage = () => {
                       {language === 'en' ? 'Age' : 'പ്രായം'}
                     </th>
                     <th className="text-center py-3 px-4 font-semibold">
-                      {language === 'en' ? 'Party' : 'പാർട്ടി'}
+                      {isAdmin 
+                        ? (language === 'en' ? 'Party' : 'പാർട്ടി')
+                        : (language === 'en' ? 'Division' : 'ഡിവിഷൻ')
+                      }
                     </th>
                     <th className="text-center py-3 px-4 font-semibold">
                       {language === 'en' ? 'Status' : 'സ്റ്റാറ്റസ്'}

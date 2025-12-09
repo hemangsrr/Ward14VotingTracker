@@ -71,9 +71,9 @@ function App() {
               }
             />
 
-            {/* Default redirect */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            {/* Default redirect - role-based */}
+            <Route path="/" element={<Navigate to="/voters" replace />} />
+            <Route path="*" element={<Navigate to="/voters" replace />} />
           </Routes>
         </LanguageProvider>
       </AuthProvider>

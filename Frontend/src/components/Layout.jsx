@@ -15,11 +15,24 @@ export const Layout = ({ children }) => {
     navigate('/login');
   };
 
-  const navItems = [
-    { path: '/dashboard', label: { en: 'Dashboard', ml: 'ഡാഷ്‌ബോർഡ്' } },
-    { path: '/voters', label: { en: 'All Voters', ml: 'എല്ലാ വോട്ടർമാരും' } },
-    { path: '/volunteers', label: { en: 'Volunteers', ml: 'സന്നദ്ധപ്രവർത്തകർ' } },
-  ];
+  // Role-based navigation items
+  const getNavItems = () => {
+    if (isAdmin) {
+      // Admin sees all navigation
+      return [
+        { path: '/dashboard', label: { en: 'Dashboard', ml: 'ഡാഷ്‌ബോർഡ്' } },
+        { path: '/voters', label: { en: 'All Voters', ml: 'എല്ലാ വോട്ടർമാരും' } },
+        { path: '/volunteers', label: { en: 'Volunteers', ml: 'സന്നദ്ധപ്രവർത്തകർ' } },
+      ];
+    } else {
+      // Volunteers only see their voters
+      return [
+        { path: '/voters', label: { en: 'My Voters', ml: 'എന്റെ വോട്ടർമാർ' } },
+      ];
+    }
+  };
+
+  const navItems = getNavItems();
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,7 +42,7 @@ export const Layout = ({ children }) => {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center">
-              <Link to="/dashboard" className="text-xl font-bold text-primary">
+              <Link to={isAdmin ? "/dashboard" : "/voters"} className="text-xl font-bold text-primary">
                 {language === 'en' ? 'Ward 14 Voting Tracker' : 'വാർഡ് 14 വോട്ടിംഗ് ട്രാക്കർ'}
               </Link>
             </div>

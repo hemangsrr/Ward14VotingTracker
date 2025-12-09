@@ -53,9 +53,24 @@ def logout_view(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def current_user_view(request):
-    """Get current authenticated user"""
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
+    """Get current authenticated user with role and volunteer info"""
+    user = request.user
+    data = UserSerializer(user).data
+    
+    # Add volunteer information if user is a volunteer
+    if hasattr(user, 'volunteer_profile'):
+        volunteer = user.volunteer_profile
+        data['volunteer'] = {
+            'id': volunteer.id,
+            'volunteer_id': volunteer.volunteer_id,
+            'name': volunteer.name,
+            'level': volunteer.level,
+            'is_read_only': volunteer.level == 'level1'
+        }
+    else:
+        data['volunteer'] = None
+    
+    return Response(data)
 
 
 @api_view(['GET'])
@@ -88,11 +103,16 @@ def health_check(request):
 
 # Voter ViewSet
 class VoterViewSet(viewsets.ModelViewSet):
-    """ViewSet for Voter CRUD operations"""
+    """
+    ViewSet for Voter CRUD operations with role-based access:
+    - Admin: Full access to all voters
+    - Level 2: Can view and edit their assigned voters
+    - Level 1: Can only view their assigned voters (read-only)
+    """
     queryset = Voter.objects.all()
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name_en', 'name_ml', 'sec_id', 'house_name_en', 'house_name_ml', 'phone_number']
+    search_fields = ['name_en', 'name_ml', 'serial_no', 'house_name_en', 'house_name_ml']
     ordering_fields = ['serial_no', 'name_en', 'age', 'has_voted']
     ordering = ['serial_no']
     
@@ -103,8 +123,60 @@ class VoterViewSet(viewsets.ModelViewSet):
             return VoterUpdateSerializer
         return VoterListSerializer
     
+    def get_permissions(self):
+        """
+        Level 1 volunteers can only view (list, retrieve)
+        Level 2 volunteers can view and edit (list, retrieve, update, partial_update)
+        Admin can do everything
+        """
+        if self.action in ['update', 'partial_update', 'destroy']:
+            # Only admin and level2 can edit
+            user = self.request.user
+            if hasattr(user, 'volunteer_profile'):
+                volunteer = user.volunteer_profile
+                if volunteer.level == 'level1':
+                    # Level 1 cannot edit
+                    return [IsAuthenticated()]
+        return super().get_permissions()
+    
+    def update(self, request, *args, **kwargs):
+        """Override update to prevent Level 1 from editing"""
+        user = request.user
+        if hasattr(user, 'volunteer_profile'):
+            volunteer = user.volunteer_profile
+            if volunteer.level == 'level1':
+                return Response(
+                    {'detail': 'Level 1 volunteers have read-only access.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        """Override partial_update to prevent Level 1 from editing"""
+        user = request.user
+        if hasattr(user, 'volunteer_profile'):
+            volunteer = user.volunteer_profile
+            if volunteer.level == 'level1':
+                return Response(
+                    {'detail': 'Level 1 volunteers have read-only access.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        return super().partial_update(request, *args, **kwargs)
+    
     def get_queryset(self):
         queryset = Voter.objects.select_related('level1_volunteer', 'level2_volunteer')
+        user = self.request.user
+        
+        # Filter based on user role
+        if hasattr(user, 'volunteer_profile'):
+            volunteer = user.volunteer_profile
+            if volunteer.level == 'level1':
+                # Level 1 sees only their assigned voters
+                queryset = queryset.filter(level1_volunteer=volunteer)
+            elif volunteer.level == 'level2':
+                # Level 2 sees all voters assigned to them
+                queryset = queryset.filter(level2_volunteer=volunteer)
+        # Admin sees all voters (no filter)
         
         # Filter by voting status
         has_voted = self.request.query_params.get('has_voted')
@@ -245,7 +317,13 @@ class VolunteerViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def dashboard_stats(request):
-    """Get overall dashboard statistics"""
+    """Get overall dashboard statistics - Admin only"""
+    # Only admin can access dashboard
+    if request.user.role != 'admin':
+        return Response(
+            {'detail': 'Dashboard is only accessible to administrators.'},
+            status=status.HTTP_403_FORBIDDEN
+        )
     total_voters = Voter.objects.count()
     voted_count = Voter.objects.filter(has_voted=True).count()
     not_voted_count = total_voters - voted_count
