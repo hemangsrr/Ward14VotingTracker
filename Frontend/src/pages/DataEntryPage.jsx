@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { votersAPI } from '@/services/api';
+import { votersAPI, settingsAPI } from '@/services/api';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { CheckCircle, AlertCircle, Keyboard } from 'lucide-react';
+import { CheckCircle, AlertCircle, Keyboard, Lock } from 'lucide-react';
+
+const STORAGE_KEY = 'data_entry_marked_voters';
 
 export const DataEntryPage = () => {
   const { language } = useLanguage();
@@ -10,17 +12,68 @@ export const DataEntryPage = () => {
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState('success'); // 'success' or 'error'
   const [markedVoters, setMarkedVoters] = useState([]);
+  const [votingEnabled, setVotingEnabled] = useState(true);
+  const [checkingSettings, setCheckingSettings] = useState(true);
   const inputRef = useRef(null);
+
+  // Load marked voters from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        setMarkedVoters(JSON.parse(stored));
+      } catch (e) {
+        console.error('Failed to load marked voters from storage:', e);
+      }
+    }
+  }, []);
+
+  // Save marked voters to localStorage whenever it changes
+  useEffect(() => {
+    if (markedVoters.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(markedVoters));
+    }
+  }, [markedVoters]);
+
+  // Check voting settings on mount
+  useEffect(() => {
+    checkVotingSettings();
+  }, []);
 
   // Focus input on mount
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    if (votingEnabled && !checkingSettings) {
+      inputRef.current?.focus();
+    }
+  }, [votingEnabled, checkingSettings]);
+
+  const checkVotingSettings = async () => {
+    try {
+      const response = await settingsAPI.getSettings();
+      setVotingEnabled(response.data.voting_enabled);
+    } catch (err) {
+      console.error('Failed to check voting settings:', err);
+      // Default to enabled if we can't check
+      setVotingEnabled(true);
+    } finally {
+      setCheckingSettings(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!serialNo.trim()) {
+      return;
+    }
+
+    // Check if voting is enabled
+    if (!votingEnabled) {
+      setMessage(language === 'en' 
+        ? 'Voting is currently disabled. Please enable it from settings.' 
+        : 'വോട്ടിംഗ് നിലവിൽ പ്രവർത്തനരഹിതമാണ്. ക്രമീകരണങ്ങളിൽ നിന്ന് ഇത് പ്രവർത്തനക്ഷമമാക്കുക.'
+      );
+      setMessageType('error');
       return;
     }
 
@@ -124,6 +177,16 @@ export const DataEntryPage = () => {
     }
   };
 
+  if (checkingSettings) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-lg text-muted-foreground">
+          {language === 'en' ? 'Loading...' : 'ലോഡ് ചെയ്യുന്നു...'}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -137,6 +200,25 @@ export const DataEntryPage = () => {
             : 'വോട്ടർ വോട്ട് ചെയ്തതായി അടയാളപ്പെടുത്താൻ സീരിയൽ നമ്പർ നൽകുക'}
         </p>
       </div>
+
+      {/* Voting Disabled Warning */}
+      {!votingEnabled && (
+        <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6">
+          <div className="flex items-center gap-3">
+            <Lock className="w-6 h-6 text-orange-600" />
+            <div>
+              <h3 className="font-semibold text-orange-900">
+                {language === 'en' ? 'Voting is Disabled' : 'വോട്ടിംഗ് പ്രവർത്തനരഹിതമാണ്'}
+              </h3>
+              <p className="text-sm text-orange-700 mt-1">
+                {language === 'en' 
+                  ? 'Data entry is currently disabled. Please enable voting from settings to continue.' 
+                  : 'ഡാറ്റ എൻട്രി നിലവിൽ പ്രവർത്തനരഹിതമാണ്. തുടരാൻ ക്രമീകരണങ്ങളിൽ നിന്ന് വോട്ടിംഗ് പ്രവർത്തനക്ഷമമാക്കുക.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Input Card */}
       <div className="bg-card border border-border rounded-lg p-8 shadow-sm">
@@ -154,7 +236,7 @@ export const DataEntryPage = () => {
               value={serialNo}
               onChange={(e) => setSerialNo(e.target.value)}
               onKeyPress={handleKeyPress}
-              disabled={loading}
+              disabled={loading || !votingEnabled}
               placeholder={language === 'en' ? 'Enter serial number and press Enter' : 'സീരിയൽ നമ്പർ നൽകി എന്റർ അമർത്തുക'}
               className="w-full px-6 py-4 text-2xl border-2 border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
               autoFocus
