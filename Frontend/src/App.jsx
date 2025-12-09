@@ -10,6 +10,7 @@ import { VotersPage } from '@/pages/VotersPage';
 import { VoterDetailPage } from '@/pages/VoterDetailPage';
 import { VolunteersPage } from '@/pages/VolunteersPage';
 import { VolunteerVotersPage } from '@/pages/VolunteerVotersPage';
+import { DataEntryPage } from '@/pages/DataEntryPage';
 
 function App() {
   return (
@@ -27,6 +28,16 @@ function App() {
                 <AdminRoute>
                   <Layout>
                     <DashboardPage />
+                  </Layout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/data-entry"
+              element={
+                <AdminRoute>
+                  <Layout>
+                    <DataEntryPage />
                   </Layout>
                 </AdminRoute>
               }

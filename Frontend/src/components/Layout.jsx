@@ -21,6 +21,7 @@ export const Layout = ({ children }) => {
       // Admin sees all navigation
       return [
         { path: '/dashboard', label: { en: 'Dashboard', ml: 'ഡാഷ്‌ബോർഡ്' } },
+        { path: '/data-entry', label: { en: 'Data Entry', ml: 'ഡാറ്റ എൻട്രി' } },
         { path: '/voters', label: { en: 'All Voters', ml: 'എല്ലാ വോട്ടർമാരും' } },
         { path: '/volunteers', label: { en: 'Volunteers', ml: 'സന്നദ്ധപ്രവർത്തകർ' } },
       ];
