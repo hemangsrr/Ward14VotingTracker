@@ -76,7 +76,7 @@ echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 # Stop PostgreSQL (supervisor will restart it)
-su - postgres -c "/usr/lib/postgresql/15/bin/pg_ctl -D /var/lib/postgresql/data stop"
+su - postgres -c "${PG_BIN}/pg_ctl -D /var/lib/postgresql/data stop"
 
 echo "=========================================="
 echo "Starting all services with Supervisor..."
