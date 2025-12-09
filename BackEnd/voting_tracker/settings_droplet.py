@@ -60,6 +60,10 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     'http://127.0.0.1',
     'http://134.209.152.3',
+    'http://vote-tracker.in',
+    'http://www.vote-tracker.in',
+    'https://vote-tracker.in',
+    'https://www.vote-tracker.in',
 ]
 
 # Session and Cookie settings for HTTP

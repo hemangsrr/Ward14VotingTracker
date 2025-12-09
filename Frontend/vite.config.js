@@ -19,4 +19,10 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    allowedHosts: [
+      'vote-tracker.in',
+      'www.vote-tracker.in',
+    ],
+  },
 })
