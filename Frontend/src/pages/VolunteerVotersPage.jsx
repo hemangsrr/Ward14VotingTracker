@@ -133,12 +133,26 @@ export const VolunteerVotersPage = () => {
       {volunteer && (
         <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
           <div className="flex items-start justify-between">
-            <div>
+            <div className="flex-1">
               <h1 className="text-2xl font-bold text-primary">
-                {language === 'en' ? volunteer.name_en : volunteer.name_ml || volunteer.name_en}
+                {volunteer.name}
               </h1>
-              {volunteer.phone_number && (
-                <p className="text-muted-foreground mt-1">{volunteer.phone_number}</p>
+              <div className="flex items-center gap-4 mt-2">
+                <p className="text-sm text-muted-foreground">
+                  ID: {volunteer.volunteer_id}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {volunteer.level === 'level1' 
+                    ? (language === 'en' ? 'Level 1 Volunteer' : 'ലെവൽ 1 സന്നദ്ധപ്രവർത്തകൻ')
+                    : (language === 'en' ? 'Level 2 Volunteer' : 'ലെവൽ 2 സന്നദ്ധപ്രവർത്തകൻ')
+                  }
+                </p>
+              </div>
+              {volunteer.parent_volunteer_name && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {language === 'en' ? 'Supervisor: ' : 'സൂപ്പർവൈസർ: '}
+                  <span className="font-medium text-foreground">{volunteer.parent_volunteer_name}</span>
+                </p>
               )}
             </div>
             <div className="text-right">

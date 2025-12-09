@@ -98,11 +98,11 @@ export const VolunteersPage = () => {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-foreground">
-                    {language === 'en' ? volunteer.name_en : volunteer.name_ml || volunteer.name_en}
+                    {volunteer.name}
                   </h3>
-                  {volunteer.phone_number && (
-                    <p className="text-sm text-muted-foreground mt-1">{volunteer.phone_number}</p>
-                  )}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ID: {volunteer.volunteer_id}
+                  </p>
                 </div>
                 <Users className="w-8 h-8 text-primary opacity-20" />
               </div>
