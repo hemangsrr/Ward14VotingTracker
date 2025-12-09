@@ -1,6 +1,7 @@
 """
 Droplet deployment settings for Ward 14 Voting Tracker
-For HTTP deployment on Ubuntu droplet
+For HTTPS deployment on Ubuntu droplet with Let's Encrypt SSL
+Domain: vote-tracker.in
 """
 from .settings import *
 import os
@@ -27,8 +28,14 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-# Allow all hosts for simplicity
-ALLOWED_HOSTS = ['*']
+# Allowed hosts for production
+ALLOWED_HOSTS = [
+    'vote-tracker.in',
+    'www.vote-tracker.in',
+    '68.183.95.232',
+    'localhost',
+    '127.0.0.1',
+]
 
 # Database - PostgreSQL
 DATABASES = {
@@ -51,33 +58,35 @@ STATICFILES_DIRS = []
 MEDIA_ROOT = str(BASE_DIR / 'media')
 MEDIA_URL = '/media/'
 
-# CORS settings - Allow all origins for HTTP deployment
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS settings - Allow specific origins for HTTPS deployment
+CORS_ALLOWED_ORIGINS = [
+    'https://vote-tracker.in',
+    'https://www.vote-tracker.in',
+]
 CORS_ALLOW_CREDENTIALS = True
 
-# CSRF settings for HTTP deployment
+# CSRF settings for HTTPS deployment
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost',
-    'http://127.0.0.1',
-    'http://68.183.95.232/',
-    'http://vote-tracker.in',
-    'http://www.vote-tracker.in',
     'https://vote-tracker.in',
     'https://www.vote-tracker.in',
 ]
 
-# Session and Cookie settings for HTTP
+# Session and Cookie settings for HTTPS
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False  # Must be False for JavaScript to read it
-SESSION_COOKIE_SECURE = False  # HTTP deployment
-CSRF_COOKIE_SECURE = False  # HTTP deployment
+SESSION_COOKIE_SECURE = True  # HTTPS deployment - secure cookies only
+CSRF_COOKIE_SECURE = True  # HTTPS deployment - secure cookies only
 SESSION_COOKIE_DOMAIN = None
 CSRF_COOKIE_DOMAIN = None
 
-# Security settings for HTTP deployment
-SECURE_SSL_REDIRECT = False
+# Security settings for HTTPS deployment
+SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Trust nginx proxy
+SECURE_HSTS_SECONDS = 31536000  # 1 year HSTS
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'SAMEORIGIN'
