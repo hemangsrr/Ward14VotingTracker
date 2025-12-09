@@ -22,28 +22,44 @@ class User(AbstractUser):
 
 
 class Volunteer(models.Model):
-    """Volunteer model for Level 1 and Level 2 volunteers"""
+    """
+    Volunteer model for Level 1 (bottom) and Level 2 (supervisors) volunteers
+    Level 1: Bottom level volunteers who manage voters
+    Level 2: Supervisors who oversee Level 1 volunteers
+    """
     LEVEL_CHOICES = [
-        ('level1', 'Level 1'),
-        ('level2', 'Level 2'),
+        ('level1', 'Level 1 (Bottom)'),
+        ('level2', 'Level 2 (Supervisor)'),
     ]
     
     volunteer_id = models.IntegerField(
         verbose_name="Volunteer ID",
-        help_text="Unique ID within the level (e.g., Level 1: 1,2,3... Level 2: 1,2,3...)"
+        help_text="Unique ID to group voters and view stats/dashboard",
+        unique=True
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='volunteer_profile', null=True, blank=True)
-    name_en = models.CharField(max_length=200, verbose_name="Name (English)")
-    name_ml = models.CharField(max_length=200, verbose_name="Name (Malayalam)", blank=True)
-    level = models.CharField(max_length=10, choices=LEVEL_CHOICES)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    user = models.OneToOneField(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='volunteer_profile',
+        help_text="Linked user account for login"
+    )
+    name = models.CharField(
+        max_length=200, 
+        verbose_name="Name",
+        help_text="Volunteer name (English only)"
+    )
+    level = models.CharField(
+        max_length=10, 
+        choices=LEVEL_CHOICES,
+        help_text="Level 1 = Bottom, Level 2 = Supervisor"
+    )
     parent_volunteer = models.ForeignKey(
         'self', 
         on_delete=models.SET_NULL, 
         null=True, 
         blank=True,
         related_name='sub_volunteers',
-        help_text="Level 1 volunteer (for Level 2 volunteers)"
+        help_text="Level 2 supervisor (only for Level 1 volunteers)"
     )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -52,10 +68,15 @@ class Volunteer(models.Model):
     class Meta:
         db_table = 'volunteers'
         ordering = ['level', 'volunteer_id']
-        unique_together = [['level', 'volunteer_id']]
     
     def __str__(self):
-        return f"{self.get_level_display()} - {self.volunteer_id}: {self.name_en}"
+        return f"{self.get_level_display()} - ID {self.volunteer_id}: {self.name}"
+    
+    def save(self, *args, **kwargs):
+        # Ensure Level 2 volunteers don't have a parent
+        if self.level == 'level2':
+            self.parent_volunteer = None
+        super().save(*args, **kwargs)
 
 
 class Voter(models.Model):

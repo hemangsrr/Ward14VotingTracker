@@ -13,13 +13,13 @@ class UserSerializer(serializers.ModelSerializer):
 class VolunteerSerializer(serializers.ModelSerializer):
     """Serializer for Volunteer model"""
     user_username = serializers.CharField(source='user.username', read_only=True)
-    parent_volunteer_name = serializers.CharField(source='parent_volunteer.name_en', read_only=True)
+    parent_volunteer_name = serializers.CharField(source='parent_volunteer.name', read_only=True)
     voter_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Volunteer
         fields = [
-            'id', 'volunteer_id', 'name_en', 'name_ml', 'level', 'phone_number',
+            'id', 'volunteer_id', 'name', 'level',
             'parent_volunteer', 'parent_volunteer_name', 'user', 'user_username',
             'is_active', 'voter_count', 'created_at', 'updated_at'
         ]

@@ -22,22 +22,27 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(Volunteer)
 class VolunteerAdmin(admin.ModelAdmin):
     """Volunteer admin configuration"""
-    list_display = ['volunteer_id', 'name_en', 'level', 'parent_volunteer', 'phone_number', 'is_active', 'created_at']
+    list_display = ['volunteer_id', 'name', 'get_username', 'level', 'parent_volunteer', 'is_active', 'created_at']
     list_filter = ['level', 'is_active', 'created_at']
-    search_fields = ['volunteer_id', 'name_en', 'name_ml', 'phone_number']
+    search_fields = ['volunteer_id', 'name', 'user__username']
     readonly_fields = ['created_at', 'updated_at']
     ordering = ['level', 'volunteer_id']
     
     fieldsets = (
         ('Identification', {
             'fields': ('volunteer_id', 'level'),
-            'description': 'Volunteer ID is unique within each level (Level 1 and Level 2 have separate numbering)'
+            'description': 'Volunteer ID is globally unique and used to group voters and view stats'
         }),
         ('Basic Information', {
-            'fields': ('name_en', 'name_ml', 'phone_number')
+            'fields': ('name',)
+        }),
+        ('Login Account', {
+            'fields': ('user',),
+            'description': 'Create a User account first, then link it here. Username and password are managed in the User model.'
         }),
         ('Hierarchy', {
-            'fields': ('parent_volunteer', 'user')
+            'fields': ('parent_volunteer',),
+            'description': 'Level 1 volunteers can have a Level 2 supervisor. Level 2 volunteers have no parent.'
         }),
         ('Status', {
             'fields': ('is_active',)
@@ -47,6 +52,11 @@ class VolunteerAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    def get_username(self, obj):
+        """Display the linked username"""
+        return obj.user.username if obj.user else '-'
+    get_username.short_description = 'Username'
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
