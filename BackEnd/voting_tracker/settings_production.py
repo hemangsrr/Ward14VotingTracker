@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'hemangsrr-voting-tracker-2mmez.ondigitalocean.app', 'localhost', '127.0.0.1']
 
 # Add WhiteNoise middleware for static file serving
 MIDDLEWARE = [
@@ -52,6 +52,19 @@ MEDIA_URL = '/media/'
 # CORS settings for production - Allow all origins
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF settings for production
+CSRF_TRUSTED_ORIGINS = [
+    'https://hemangsrr-voting-tracker-2mmez.ondigitalocean.app',
+    'http://localhost',
+    'http://127.0.0.1',
+]
+
+# Session and Cookie settings for production
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False  # Must be False for JavaScript to read it
 
 # Security settings for production
 if not DEBUG:
