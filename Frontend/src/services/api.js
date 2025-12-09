@@ -69,7 +69,7 @@ export const votersAPI = {
 
 // Volunteers APIs
 export const volunteersAPI = {
-  getAll: () => api.get('/volunteers/'),
+  getAll: (params) => api.get('/volunteers/', { params }),
   getById: (id) => api.get(`/volunteers/${id}/`),
   getVoters: (id, params) => api.get(`/volunteers/${id}/voters/`, { params }),
 };
