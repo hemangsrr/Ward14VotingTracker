@@ -28,8 +28,8 @@ class Volunteer(models.Model):
     Level 2: Supervisors who oversee Level 1 volunteers
     """
     LEVEL_CHOICES = [
-        ('level1', 'Level 1 (Bottom)'),
-        ('level2', 'Level 2 (Supervisor)'),
+        ('level1', 'Level 1'),
+        ('level2', 'Level 2'),
     ]
     
     volunteer_id = models.IntegerField(
@@ -59,7 +59,7 @@ class Volunteer(models.Model):
         null=True, 
         blank=True,
         related_name='sub_volunteers',
-        help_text="Level 2 supervisor (only for Level 1 volunteers)"
+        help_text="Level 2 Volunteer (only for Level 1 volunteers)"
     )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

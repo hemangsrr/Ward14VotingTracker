@@ -173,9 +173,9 @@ class VolunteerViewSet(viewsets.ModelViewSet):
     serializer_class = VolunteerSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name_en', 'name_ml', 'phone_number']
-    ordering_fields = ['name_en', 'level', 'created_at']
-    ordering = ['level', 'name_en']
+    search_fields = ['name', 'user__username']
+    ordering_fields = ['name', 'level', 'created_at']
+    ordering = ['level', 'name']
     
     def get_queryset(self):
         queryset = Volunteer.objects.select_related('parent_volunteer', 'user')
@@ -233,7 +233,7 @@ class VolunteerViewSet(viewsets.ModelViewSet):
         
         return Response({
             'volunteer_id': volunteer.id,
-            'volunteer_name': volunteer.name_en,
+            'volunteer_name': volunteer.name,
             'total_voters': total,
             'voted_count': voted,
             'not_voted_count': total - voted,
@@ -278,7 +278,7 @@ def dashboard_stats(request):
         voted = voters.filter(has_voted=True).count()
         level1_stats.append({
             'id': volunteer.id,
-            'name': volunteer.name_en,
+            'name': volunteer.name,
             'total_voters': total,
             'voted_count': voted,
             'not_voted_count': total - voted,
@@ -294,7 +294,7 @@ def dashboard_stats(request):
         voted = voters.filter(has_voted=True).count()
         level2_stats.append({
             'id': volunteer.id,
-            'name': volunteer.name_en,
+            'name': volunteer.name,
             'total_voters': total,
             'voted_count': voted,
             'not_voted_count': total - voted,

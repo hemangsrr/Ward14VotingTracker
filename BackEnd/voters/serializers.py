@@ -35,8 +35,8 @@ class VolunteerSerializer(serializers.ModelSerializer):
 
 class VoterListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for voter lists"""
-    level1_volunteer_name = serializers.CharField(source='level1_volunteer.name_en', read_only=True)
-    level2_volunteer_name = serializers.CharField(source='level2_volunteer.name_en', read_only=True)
+    level1_volunteer_name = serializers.CharField(source='level1_volunteer.name', read_only=True)
+    level2_volunteer_name = serializers.CharField(source='level2_volunteer.name', read_only=True)
     
     class Meta:
         model = Voter
@@ -51,8 +51,8 @@ class VoterListSerializer(serializers.ModelSerializer):
 
 class VoterDetailSerializer(serializers.ModelSerializer):
     """Detailed serializer for individual voter"""
-    level1_volunteer_name = serializers.CharField(source='level1_volunteer.name_en', read_only=True)
-    level2_volunteer_name = serializers.CharField(source='level2_volunteer.name_en', read_only=True)
+    level1_volunteer_name = serializers.CharField(source='level1_volunteer.name', read_only=True)
+    level2_volunteer_name = serializers.CharField(source='level2_volunteer.name', read_only=True)
     
     class Meta:
         model = Voter
