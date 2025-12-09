@@ -75,6 +75,17 @@ EOF
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
+# Import voters from CSV files
+echo "Importing voters from CSV files..."
+if [ -f "/app/data/VotersList_Ward14_en.csv" ] && [ -f "/app/data/VotersList_Ward14_ml.csv" ]; then
+    python manage.py import_voters \
+        --en-file /app/data/VotersList_Ward14_en.csv \
+        --ml-file /app/data/VotersList_Ward14_ml.csv
+    echo "Voter import completed"
+else
+    echo "Warning: CSV files not found, skipping voter import"
+fi
+
 # Stop PostgreSQL (supervisor will restart it)
 su - postgres -c "${PG_BIN}/pg_ctl -D /var/lib/postgresql/data stop"
 

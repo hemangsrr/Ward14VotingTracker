@@ -35,6 +35,11 @@ WORKDIR /app
 # Copy backend code
 COPY BackEnd/ /app/backend/
 
+# Create data directory and copy CSV files
+RUN mkdir -p /app/data
+COPY ["Chuduvalathur Ward List/VotersList_Ward14_en.csv", "/app/data/"]
+COPY ["Chuduvalathur Ward List/VotersList_Ward14_ml.csv", "/app/data/"]
+
 # Install Python dependencies
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt && \
     pip install --no-cache-dir gunicorn
