@@ -21,18 +21,21 @@ server {
     server_name _;
     client_max_body_size 10M;
 
-    # Django static files
+    # Django static files - served directly by Nginx
     location /static/ {
-        alias /home/ubuntu/Ward14VotingTracker/BackEnd/staticfiles/;
+        alias STATIC_PATH_PLACEHOLDER;
         expires 30d;
         add_header Cache-Control "public, immutable";
+        autoindex off;
+        access_log off;
     }
 
     # Django media files
     location /media/ {
-        alias /home/ubuntu/Ward14VotingTracker/BackEnd/media/;
+        alias MEDIA_PATH_PLACEHOLDER;
         expires 30d;
         add_header Cache-Control "public, immutable";
+        autoindex off;
     }
 
     # Django API and admin
@@ -70,11 +73,23 @@ server {
 EOF
 
 # Update the static files path in the nginx config to match actual location
-ACTUAL_STATIC_PATH="$BACKEND_DIR/staticfiles"
-ACTUAL_MEDIA_PATH="$BACKEND_DIR/media"
+ACTUAL_STATIC_PATH="$BACKEND_DIR/staticfiles/"
+ACTUAL_MEDIA_PATH="$BACKEND_DIR/media/"
 
-sudo sed -i "s|/home/ubuntu/Ward14VotingTracker/BackEnd/staticfiles/|$ACTUAL_STATIC_PATH/|g" /etc/nginx/sites-available/voting-tracker
-sudo sed -i "s|/home/ubuntu/Ward14VotingTracker/BackEnd/media/|$ACTUAL_MEDIA_PATH/|g" /etc/nginx/sites-available/voting-tracker
+echo "Static files path: $ACTUAL_STATIC_PATH"
+echo "Media files path: $ACTUAL_MEDIA_PATH"
+
+# Ensure directories exist
+mkdir -p "$BACKEND_DIR/staticfiles"
+mkdir -p "$BACKEND_DIR/media"
+
+# Set proper permissions
+sudo chmod -R 755 "$BACKEND_DIR/staticfiles"
+sudo chmod -R 755 "$BACKEND_DIR/media"
+
+# Replace placeholders with actual paths
+sudo sed -i "s|STATIC_PATH_PLACEHOLDER|$ACTUAL_STATIC_PATH|g" /etc/nginx/sites-available/voting-tracker
+sudo sed -i "s|MEDIA_PATH_PLACEHOLDER|$ACTUAL_MEDIA_PATH|g" /etc/nginx/sites-available/voting-tracker
 
 # Enable the site
 echo "Enabling site..."
