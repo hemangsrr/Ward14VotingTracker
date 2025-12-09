@@ -65,12 +65,13 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False  # Must be False for JavaScript to read it
+SESSION_COOKIE_SECURE = True  # Required for HTTPS
+CSRF_COOKIE_SECURE = True  # Required for HTTPS
 
 # Security settings for production
 if not DEBUG:
-    SECURE_SSL_REDIRECT = False  # Nginx handles SSL
-    SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
-    CSRF_COOKIE_SECURE = False  # Set to True if using HTTPS
+    SECURE_SSL_REDIRECT = False  # DigitalOcean handles SSL at load balancer
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Trust DigitalOcean proxy
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'SAMEORIGIN'
