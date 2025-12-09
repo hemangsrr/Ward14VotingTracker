@@ -6,7 +6,7 @@ FROM node:18-alpine AS frontend-builder
 # Build React frontend
 WORKDIR /frontend
 COPY Frontend/package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 COPY Frontend/ ./
 RUN npm run build
 
