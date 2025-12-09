@@ -5,15 +5,20 @@ echo "=========================================="
 echo "Ward 14 Voting Tracker - Starting Services"
 echo "=========================================="
 
+# Find PostgreSQL version and binaries
+PG_VERSION=$(ls /usr/lib/postgresql/ | head -n 1)
+PG_BIN="/usr/lib/postgresql/${PG_VERSION}/bin"
+echo "Detected PostgreSQL version: ${PG_VERSION}"
+
 # Initialize PostgreSQL if not already initialized
 if [ ! -d "/var/lib/postgresql/data/base" ]; then
     echo "Initializing PostgreSQL database..."
     mkdir -p /var/lib/postgresql/data
     chown -R postgres:postgres /var/lib/postgresql
-    su - postgres -c "/usr/lib/postgresql/15/bin/initdb -D /var/lib/postgresql/data"
+    su - postgres -c "${PG_BIN}/initdb -D /var/lib/postgresql/data"
     
     # Start PostgreSQL temporarily to create database
-    su - postgres -c "/usr/lib/postgresql/15/bin/pg_ctl -D /var/lib/postgresql/data -l /tmp/postgres.log start"
+    su - postgres -c "${PG_BIN}/pg_ctl -D /var/lib/postgresql/data -l /tmp/postgres.log start"
     
     # Wait for PostgreSQL to start
     echo "Waiting for PostgreSQL to start..."
@@ -26,14 +31,14 @@ if [ ! -d "/var/lib/postgresql/data/base" ]; then
     su - postgres -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO ${POSTGRES_USER};\""
     
     # Stop PostgreSQL
-    su - postgres -c "/usr/lib/postgresql/15/bin/pg_ctl -D /var/lib/postgresql/data stop"
+    su - postgres -c "${PG_BIN}/pg_ctl -D /var/lib/postgresql/data stop"
     
     echo "PostgreSQL initialized successfully"
 fi
 
 # Start PostgreSQL
 echo "Starting PostgreSQL..."
-su - postgres -c "/usr/lib/postgresql/15/bin/pg_ctl -D /var/lib/postgresql/data -l /tmp/postgres.log start"
+su - postgres -c "${PG_BIN}/pg_ctl -D /var/lib/postgresql/data -l /tmp/postgres.log start"
 
 # Wait for PostgreSQL to be ready
 echo "Waiting for PostgreSQL to be ready..."
