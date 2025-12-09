@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { AdminRoute } from '@/components/AdminRoute';
 import { Layout } from '@/components/Layout';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
@@ -19,17 +20,39 @@ function App() {
             {/* Public routes */}
             <Route path="/login" element={<LoginPage />} />
 
-            {/* Protected routes */}
+            {/* Admin-only routes */}
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute>
+                <AdminRoute>
                   <Layout>
                     <DashboardPage />
                   </Layout>
-                </ProtectedRoute>
+                </AdminRoute>
               }
             />
+            <Route
+              path="/volunteers"
+              element={
+                <AdminRoute>
+                  <Layout>
+                    <VolunteersPage />
+                  </Layout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/volunteers/:id/voters"
+              element={
+                <AdminRoute>
+                  <Layout>
+                    <VolunteerVotersPage />
+                  </Layout>
+                </AdminRoute>
+              }
+            />
+
+            {/* Protected routes (all authenticated users) */}
             <Route
               path="/voters"
               element={
@@ -46,26 +69,6 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <VoterDetailPage />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/volunteers"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <VolunteersPage />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/volunteers/:id/voters"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <VolunteerVotersPage />
                   </Layout>
                 </ProtectedRoute>
               }

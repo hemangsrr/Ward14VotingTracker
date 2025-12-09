@@ -22,9 +22,17 @@ export const VotersPage = () => {
   
   // Filters - Default to LDF/Division A and not voted for volunteers
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterVoted, setFilterVoted] = useState(isAdmin ? 'all' : 'not_voted');
-  const [filterParty, setFilterParty] = useState(isAdmin ? 'all' : 'ldf'); // ldf = Division A
+  const [filterVoted, setFilterVoted] = useState('not_voted');
+  const [filterParty, setFilterParty] = useState('ldf'); // ldf = Division A
   const [filterStatus, setFilterStatus] = useState('all');
+  
+  // Set default filters based on role after user is loaded
+  useEffect(() => {
+    if (user && isAdmin) {
+      setFilterVoted('all');
+      setFilterParty('all');
+    }
+  }, [user, isAdmin]);
   
   // Division mapping for volunteers (hide actual party names)
   const getDivisionLabel = (partyCode) => {

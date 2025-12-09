@@ -47,18 +47,20 @@ export const Layout = ({ children }) => {
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="text-foreground hover:text-primary transition-colors font-medium"
-                >
-                  {item.label[language]}
-                </Link>
-              ))}
-            </nav>
+            {/* Desktop Navigation - Only show for admin */}
+            {isAdmin && (
+              <nav className="hidden md:flex items-center space-x-6">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className="text-foreground hover:text-primary transition-colors font-medium"
+                  >
+                    {item.label[language]}
+                  </Link>
+                ))}
+              </nav>
+            )}
 
             {/* Right side actions */}
             <div className="flex items-center space-x-4">
@@ -90,13 +92,15 @@ export const Layout = ({ children }) => {
                 </span>
               </button>
 
-              {/* Mobile menu button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-md hover:bg-accent"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+              {/* Mobile menu button - Only show for admin */}
+              {isAdmin && (
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="md:hidden p-2 rounded-md hover:bg-accent"
+                >
+                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
+              )}
             </div>
           </div>
         </div>
