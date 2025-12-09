@@ -59,7 +59,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     'http://127.0.0.1',
-    'http://134.209.152.3',
+    'http://68.183.95.232/',
     'http://vote-tracker.in',
     'http://www.vote-tracker.in',
     'https://vote-tracker.in',
