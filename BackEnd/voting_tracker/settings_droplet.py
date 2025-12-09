@@ -10,7 +10,16 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
-from decouple import config
+try:
+    from decouple import config
+except ImportError:
+    # Fallback if python-decouple is not installed
+    import os
+    def config(key, default=None, cast=None):
+        value = os.environ.get(key, default)
+        if cast and value is not None:
+            return cast(value)
+        return value
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
@@ -33,13 +42,13 @@ DATABASES = {
     }
 }
 
-# Static files
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Static files - use absolute path relative to BASE_DIR
+STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = []
 
 # Media files
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = str(BASE_DIR / 'media')
 MEDIA_URL = '/media/'
 
 # CORS settings - Allow all origins for HTTP deployment
@@ -50,6 +59,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     'http://127.0.0.1',
+    'http://134.209.152.3',
 ]
 
 # Session and Cookie settings for HTTP
