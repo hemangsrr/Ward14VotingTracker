@@ -60,7 +60,7 @@ COPY docker/start-postgres.sh /app/docker/start-postgres.sh
 RUN chmod +x /app/entrypoint.sh /app/docker/start-postgres.sh
 
 # Expose port
-EXPOSE 8080
+EXPOSE 80
 
 # Set entrypoint
 ENTRYPOINT ["/app/entrypoint.sh"]
