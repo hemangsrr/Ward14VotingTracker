@@ -231,102 +231,175 @@ export const VoterDetailPage = () => {
             </div>
           </div>
 
-          {/* Editable Fields */}
+          {/* Tracking Information - Read-only for Level 1, Editable for Level 2 & Admin */}
           <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4 text-primary">
               {language === 'en' ? 'Tracking Information' : 'ട്രാക്കിംഗ് വിവരങ്ങൾ'}
             </h2>
             
-            <div className="space-y-4">
-              {/* Status */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  {language === 'en' ? 'Status' : 'സ്റ്റാറ്റസ്'}
-                </label>
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  disabled={isReadOnly}
-                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <option value="active">{language === 'en' ? 'Active' : 'സജീവം'}</option>
-                  <option value="out_of_station">{language === 'en' ? 'Out of Station' : 'സ്റ്റേഷനു പുറത്ത്'}</option>
-                  <option value="deceased">{language === 'en' ? 'Deceased' : 'മരണപ്പെട്ടു'}</option>
-                  <option value="postal_vote">{language === 'en' ? 'Postal Vote' : 'തപാൽ വോട്ട്'}</option>
-                </select>
-              </div>
-
-              {/* Party/Division */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  {isAdmin 
-                    ? (language === 'en' ? 'Party' : 'പാർട്ടി')
-                    : (language === 'en' ? 'Division' : 'ഡിവിഷൻ')
-                  }
-                </label>
-                <select
-                  value={party}
-                  onChange={(e) => setParty(e.target.value)}
-                  disabled={isReadOnly}
-                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isAdmin ? (
-                    <>
-                      <option value="ldf">LDF</option>
-                      <option value="udf">UDF</option>
-                      <option value="bjp">BJP</option>
-                      <option value="other">{language === 'en' ? 'Other' : 'മറ്റുള്ളവ'}</option>
-                      <option value="unknown">{language === 'en' ? 'Unknown' : 'അറിയില്ല'}</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="ldf">Division A</option>
-                      <option value="udf">Division B</option>
-                      <option value="bjp">Division C</option>
-                      <option value="other">Division D</option>
-                      <option value="unknown">-</option>
-                    </>
-                  )}
-                </select>
-              </div>
-
-              {/* Voted */}
-              <div>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={hasVoted}
-                    onChange={(e) => setHasVoted(e.target.checked)}
-                    disabled={isReadOnly || !votingEnabled}
-                    className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                  <span className="text-sm font-medium">
-                    {language === 'en' ? 'Has Voted' : 'വോട്ട് ചെയ്തു'}
-                  </span>
-                  {hasVoted ? (
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                  ) : (
-                    <XCircle className="w-5 h-5 text-orange-600" />
-                  )}
-                </label>
-                {!votingEnabled && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {language === 'en' ? 'Voting is currently disabled. Admin must enable it from settings.' : 'വോട്ടിംഗ് നിലവിൽ പ്രവർത്തനരഹിതമാണ്. അഡ്മിൻ ക്രമീകരണങ്ങളിൽ നിന്ന് ഇത് പ്രവർത്തനക്ഷമമാക്കണം.'}
+            {isReadOnly ? (
+              /* Read-only view for Level 1 volunteers */
+              <div className="space-y-4">
+                {/* Status - Read Only */}
+                <div className="border-b border-border pb-3">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    {language === 'en' ? 'Status' : 'സ്റ്റാറ്റസ്'}
+                  </label>
+                  <p className="text-base font-medium">
+                    {status === 'active' && (language === 'en' ? 'Active' : 'സജീവം')}
+                    {status === 'out_of_station' && (language === 'en' ? 'Out of Station' : 'സ്റ്റേഷനു പുറത്ത്')}
+                    {status === 'deceased' && (language === 'en' ? 'Deceased' : 'മരണപ്പെട്ടു')}
+                    {status === 'postal_vote' && (language === 'en' ? 'Postal Vote' : 'തപാൽ വോട്ട്')}
                   </p>
-                )}
-              </div>
+                </div>
 
-              {/* Phone Number */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  {language === 'en' ? 'Phone Number' : 'ഫോൺ നമ്പർ'}
-                </label>
-                <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  disabled={isReadOnly}
-                  placeholder={language === 'en' ? 'Enter phone number' : 'ഫോൺ നമ്പർ നൽകുക'}
+                {/* Division - Read Only */}
+                <div className="border-b border-border pb-3">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    {language === 'en' ? 'Division' : 'ഡിവിഷൻ'}
+                  </label>
+                  <p className="text-base font-medium">
+                    {party === 'ldf' && 'Division A'}
+                    {party === 'udf' && 'Division B'}
+                    {party === 'bjp' && 'Division C'}
+                    {party === 'other' && 'Division D'}
+                    {party === 'unknown' && '-'}
+                  </p>
+                </div>
+
+                {/* Voted Status - Read Only */}
+                <div className="border-b border-border pb-3">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    {language === 'en' ? 'Voting Status' : 'വോട്ടിംഗ് സ്റ്റാറ്റസ്'}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {hasVoted ? (
+                      <>
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                        <span className="text-base font-medium text-green-600">
+                          {language === 'en' ? 'Voted' : 'വോട്ട് ചെയ്തു'}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-5 h-5 text-orange-600" />
+                        <span className="text-base font-medium text-orange-600">
+                          {language === 'en' ? 'Not Voted' : 'വോട്ട് ചെയ്തിട്ടില്ല'}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Phone Number - Read Only */}
+                <div className="border-b border-border pb-3">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    {language === 'en' ? 'Phone Number' : 'ഫോൺ നമ്പർ'}
+                  </label>
+                  <p className="text-base font-medium">
+                    {phoneNumber || (language === 'en' ? 'Not provided' : 'നൽകിയിട്ടില്ല')}
+                  </p>
+                </div>
+
+                {/* Notes - Read Only */}
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    {language === 'en' ? 'Notes' : 'കുറിപ്പുകൾ'}
+                  </label>
+                  <p className="text-base whitespace-pre-wrap">
+                    {notes || (language === 'en' ? 'No notes' : 'കുറിപ്പുകളൊന്നുമില്ല')}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* Editable view for Level 2 and Admin */
+              <div className="space-y-4">
+                {/* Status */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    {language === 'en' ? 'Status' : 'സ്റ്റാറ്റസ്'}
+                  </label>
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="active">{language === 'en' ? 'Active' : 'സജീവം'}</option>
+                    <option value="out_of_station">{language === 'en' ? 'Out of Station' : 'സ്റ്റേഷനു പുറത്ത്'}</option>
+                    <option value="deceased">{language === 'en' ? 'Deceased' : 'മരണപ്പെട്ടു'}</option>
+                    <option value="postal_vote">{language === 'en' ? 'Postal Vote' : 'തപാൽ വോട്ട്'}</option>
+                  </select>
+                </div>
+
+                {/* Party/Division */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    {isAdmin 
+                      ? (language === 'en' ? 'Party' : 'പാർട്ടി')
+                      : (language === 'en' ? 'Division' : 'ഡിവിഷൻ')
+                    }
+                  </label>
+                  <select
+                    value={party}
+                    onChange={(e) => setParty(e.target.value)}
+                    className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    {isAdmin ? (
+                      <>
+                        <option value="ldf">LDF</option>
+                        <option value="udf">UDF</option>
+                        <option value="bjp">BJP</option>
+                        <option value="other">{language === 'en' ? 'Other' : 'മറ്റുള്ളവ'}</option>
+                        <option value="unknown">{language === 'en' ? 'Unknown' : 'അറിയില്ല'}</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="ldf">Division A</option>
+                        <option value="udf">Division B</option>
+                        <option value="bjp">Division C</option>
+                        <option value="other">Division D</option>
+                        <option value="unknown">-</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+
+                {/* Voted */}
+                <div>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={hasVoted}
+                      onChange={(e) => setHasVoted(e.target.checked)}
+                      disabled={!votingEnabled}
+                      className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <span className="text-sm font-medium">
+                      {language === 'en' ? 'Has Voted' : 'വോട്ട് ചെയ്തു'}
+                    </span>
+                    {hasVoted ? (
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-orange-600" />
+                    )}
+                  </label>
+                  {!votingEnabled && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {language === 'en' ? 'Voting is currently disabled. Admin must enable it from settings.' : 'വോട്ടിംഗ് നിലവിൽ പ്രവർത്തനരഹിതമാണ്. അഡ്മിൻ ക്രമീകരണങ്ങളിൽ നിന്ന് ഇത് പ്രവർത്തനക്ഷമമാക്കണം.'}
+                    </p>
+                  )}
+                </div>
+
+                {/* Phone Number */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    {language === 'en' ? 'Phone Number' : 'ഫോൺ നമ്പർ'}
+                  </label>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder={language === 'en' ? 'Enter phone number' : 'ഫോൺ നമ്പർ നൽകുക'}
                   className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
@@ -339,13 +412,13 @@ export const VoterDetailPage = () => {
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  disabled={isReadOnly}
                   placeholder={language === 'en' ? 'Add any notes...' : 'കുറിപ്പുകൾ ചേർക്കുക...'}
                   rows={4}
-                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
