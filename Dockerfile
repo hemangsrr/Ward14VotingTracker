@@ -48,7 +48,7 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt && \
 COPY --from=frontend-builder /frontend/dist /app/frontend/dist
 
 # Create necessary directories
-RUN mkdir -p /app/staticfiles /app/media /var/log/supervisor /var/run/postgresql
+RUN mkdir -p /app/staticfiles /app/media /var/log/supervisor /var/run/postgresql /app/backend/staticfiles
 
 # Copy configuration files
 COPY docker/nginx.conf /etc/nginx/sites-available/default

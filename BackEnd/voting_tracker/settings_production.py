@@ -38,19 +38,12 @@ DATABASES = {
 }
 
 # Static files with WhiteNoise
-STATIC_ROOT = '/app/staticfiles'
+STATIC_ROOT = '/app/backend/staticfiles'
 STATIC_URL = '/static/'
+STATICFILES_DIRS = []
 
 # WhiteNoise configuration
-# Use CompressedStaticFilesStorage instead of Manifest version to avoid issues
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Media files
 MEDIA_ROOT = '/app/media'
