@@ -2,7 +2,7 @@
 # Script 3: Assign Level 2 Volunteers to Voters based on TharaList.csv
 # Maps voters (by serial_no) to Level 2 volunteers based on Thara assignments
 
-set -e
+set -e -o pipefail
 
 echo "=========================================="
 echo "Assigning Level 2 Volunteers to Voters"
@@ -43,19 +43,24 @@ echo "Processing CSV and generating SQL updates..."
 PROCESSED=0
 SKIPPED=0
 
-# Read CSV line by line (skip header) - use process substitution to avoid subshell
-while IFS=',' read -r vl_no thara_no || [ -n "$vl_no" ]; do
-    # Skip empty lines
-    if [ -z "$vl_no" ]; then
+# Read CSV line by line (skip header)
+while IFS=',' read -r vl_no thara_no remainder; do
+    # Remove leading/trailing whitespace and quotes
+    vl_no="${vl_no#"${vl_no%%[![:space:]]*}"}"
+    vl_no="${vl_no%"${vl_no##*[![:space:]]}"}"
+    vl_no="${vl_no//\"/}"
+    
+    thara_no="${thara_no#"${thara_no%%[![:space:]]*}"}"
+    thara_no="${thara_no%"${thara_no##*[![:space:]]}"}"
+    thara_no="${thara_no//\"/}"
+    
+    # Skip empty lines or invalid VL numbers
+    if [ -z "$vl_no" ] || ! [[ "$vl_no" =~ ^[0-9]+$ ]]; then
         continue
     fi
     
-    # Clean up values (remove quotes and whitespace)
-    vl_no=$(echo "$vl_no" | tr -d '"' | xargs)
-    thara_no=$(echo "$thara_no" | tr -d '"' | xargs)
-    
     # Skip if thara_no is empty
-    if [ -z "$thara_no" ]; then
+    if [ -z "$thara_no" ] || ! [[ "$thara_no" =~ ^[0-9]+$ ]]; then
         ((SKIPPED++))
         continue
     fi
@@ -65,21 +70,14 @@ while IFS=',' read -r vl_no thara_no || [ -n "$vl_no" ]; do
     volunteer_username=$(printf "th%02d" "$thara_no")
     
     # Generate UPDATE statement
-    # This updates the voter's level2_volunteer to the volunteer with matching username
-    cat >> "$TEMP_SQL_FILE" << EOF
-UPDATE voters 
-SET level2_volunteer_id = (
-    SELECT v.id 
-    FROM volunteers v 
-    JOIN users u ON v.user_id = u.id 
-    WHERE u.username = '$volunteer_username' AND v.level = 'level2'
-    LIMIT 1
-)
-WHERE serial_no = $vl_no;
-
-EOF
+    echo "UPDATE voters SET level2_volunteer_id = (SELECT v.id FROM volunteers v JOIN users u ON v.user_id = u.id WHERE u.username = '$volunteer_username' AND v.level = 'level2' LIMIT 1) WHERE serial_no = $vl_no;" >> "$TEMP_SQL_FILE"
     
     ((PROCESSED++))
+    
+    # Show progress every 100 records
+    if [ $((PROCESSED % 100)) -eq 0 ]; then
+        echo "  Processed $PROCESSED records..."
+    fi
 done < <(tail -n +2 "$CSV_FILE")
 
 echo "✓ Generated SQL for $PROCESSED records ($SKIPPED skipped due to missing Thara)"
