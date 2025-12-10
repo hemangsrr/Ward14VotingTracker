@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
-import { dashboardAPI } from '@/services/api';
+import { dashboardAPI, votersAPI } from '@/services/api';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Users, CheckCircle, XCircle, TrendingUp } from 'lucide-react';
+import { Users, CheckCircle, XCircle, TrendingUp, FileDown } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { generateVotingStatusPDF } from '@/utils/pdfExport';
 
 export const DashboardPage = () => {
   const { language } = useLanguage();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -25,6 +27,31 @@ export const DashboardPage = () => {
       console.error('Dashboard error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExportPDF = async (ldfOnly = false) => {
+    try {
+      setExporting(true);
+      
+      // Fetch all voted voters
+      const response = await votersAPI.getAll({ 
+        has_voted: true,
+        page_size: 10000 // Get all voted voters
+      });
+      
+      const votedVoters = response.data.results || response.data;
+      
+      // Generate PDF
+      generateVotingStatusPDF(votedVoters, stats, ldfOnly, language);
+      
+    } catch (err) {
+      console.error('Export error:', err);
+      alert(language === 'en' 
+        ? 'Failed to export PDF. Please try again.'
+        : 'PDF എക്സ്പോർട്ട് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കുക.');
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -59,14 +86,42 @@ export const DashboardPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-primary">
-          {language === 'en' ? 'Dashboard' : 'ഡാഷ്‌ബോർഡ്'}
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          {language === 'en' ? 'Overview of voting progress' : 'വോട്ടിംഗ് പുരോഗതിയുടെ അവലോകനം'}
-        </p>
+      {/* Header with Export Buttons */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-primary">
+            {language === 'en' ? 'Dashboard' : 'ഡാഷ്‌ബോർഡ്'}
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            {language === 'en' ? 'Overview of voting progress' : 'വോട്ടിംഗ് പുരോഗതിയുടെ അവലോകനം'}
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleExportPDF(false)}
+            disabled={exporting}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FileDown className="w-4 h-4" />
+            {exporting ? (
+              language === 'en' ? 'Exporting...' : 'എക്സ്പോർട്ട് ചെയ്യുന്നു...'
+            ) : (
+              language === 'en' ? 'Export All Voters' : 'എല്ലാ വോട്ടർമാരെയും എക്സ്പോർട്ട്'
+            )}
+          </button>
+          <button
+            onClick={() => handleExportPDF(true)}
+            disabled={exporting}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FileDown className="w-4 h-4" />
+            {exporting ? (
+              language === 'en' ? 'Exporting...' : 'എക്സ്പോർട്ട് ചെയ്യുന്നു...'
+            ) : (
+              language === 'en' ? 'Export LDF Only' : 'LDF മാത്രം എക്സ്പോർട്ട്'
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
