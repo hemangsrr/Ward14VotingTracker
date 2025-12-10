@@ -34,13 +34,13 @@ export const VotersPage = () => {
     }
   }, [user, isAdmin]);
   
-  // Division mapping for volunteers (hide actual party names)
+  // Division mapping for volunteers and overview users
   const getDivisionLabel = (partyCode) => {
     const divisionMap = {
-      'ldf': 'A',
-      'udf': 'B',
-      'bjp': 'C',
-      'other': 'D',
+      'ldf': 'L',
+      'udf': 'U',
+      'bjp': 'B',
+      'other': 'O',
       'unknown': '-'
     };
     return divisionMap[partyCode] || partyCode;
@@ -119,6 +119,7 @@ export const VotersPage = () => {
       out_of_station: 'bg-blue-100 text-blue-800',
       deceased: 'bg-gray-100 text-gray-800',
       postal_vote: 'bg-purple-100 text-purple-800',
+      deleted: 'bg-red-100 text-red-800',
     };
     
     const statusLabels = {
@@ -126,6 +127,7 @@ export const VotersPage = () => {
       out_of_station: language === 'en' ? 'Out of Station' : 'സ്റ്റേഷനു പുറത്ത്',
       deceased: language === 'en' ? 'Deceased' : 'മരണപ്പെട്ടു',
       postal_vote: language === 'en' ? 'Postal Vote' : 'തപാൽ വോട്ട്',
+      deleted: language === 'en' ? 'Deleted' : 'ഇല്ലാതാക്കി',
     };
     
     return (
@@ -224,10 +226,10 @@ export const VotersPage = () => {
             ) : (
               <>
                 <option value="all">{language === 'en' ? 'All Divisions' : 'എല്ലാ ഡിവിഷനുകളും'}</option>
-                <option value="ldf">Division A</option>
-                <option value="udf">Division B</option>
-                <option value="bjp">Division C</option>
-                <option value="other">Division D</option>
+                <option value="ldf">{language === 'en' ? 'Division L' : 'ഡിവിഷൻ L'}</option>
+                <option value="udf">{language === 'en' ? 'Division U' : 'ഡിവിഷൻ U'}</option>
+                <option value="bjp">{language === 'en' ? 'Division B' : 'ഡിവിഷൻ B'}</option>
+                <option value="other">{language === 'en' ? 'Division O' : 'ഡിവിഷൻ O'}</option>
                 <option value="unknown">-</option>
               </>
             )}
@@ -244,6 +246,7 @@ export const VotersPage = () => {
             <option value="out_of_station">{language === 'en' ? 'Out of Station' : 'സ്റ്റേഷനു പുറത്ത്'}</option>
             <option value="deceased">{language === 'en' ? 'Deceased' : 'മരണപ്പെട്ടു'}</option>
             <option value="postal_vote">{language === 'en' ? 'Postal Vote' : 'തപാൽ വോട്ട്'}</option>
+            <option value="deleted">{language === 'en' ? 'Deleted' : 'ഇല്ലാതാക്കി'}</option>
           </select>
         </div>
       </div>

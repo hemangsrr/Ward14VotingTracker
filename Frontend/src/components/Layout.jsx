@@ -25,6 +25,13 @@ export const Layout = ({ children }) => {
         { path: '/voters', label: { en: 'All Voters', ml: 'എല്ലാ വോട്ടർമാരും' } },
         { path: '/volunteers', label: { en: 'Volunteers', ml: 'സന്നദ്ധപ്രവർത്തകർ' } },
       ];
+    } else if (user?.role === 'overview') {
+      // Overview users see dashboard, voters, and volunteers (read-only)
+      return [
+        { path: '/dashboard', label: { en: 'Dashboard', ml: 'ഡാഷ്‌ബോർഡ്' } },
+        { path: '/voters', label: { en: 'All Voters', ml: 'എല്ലാ വോട്ടർമാരും' } },
+        { path: '/volunteers', label: { en: 'Volunteers', ml: 'സന്നദ്ധപ്രവർത്തകർ' } },
+      ];
     } else {
       // Volunteers only see their voters
       return [

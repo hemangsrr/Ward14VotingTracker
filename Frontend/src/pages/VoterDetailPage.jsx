@@ -11,10 +11,11 @@ export const VoterDetailPage = () => {
   const { language } = useLanguage();
   const { user, isAdmin } = useAuth();
   
-  // Check if user is Level 1 volunteer (read-only)
+  // Check if user is Level 1 volunteer or Overview user (read-only)
   const isLevel1 = user?.volunteer?.level === 'level1';
   const isLevel2 = user?.volunteer?.level === 'level2';
-  const isReadOnly = isLevel1;
+  const isOverview = user?.role === 'overview';
+  const isReadOnly = isLevel1 || isOverview;
   
   const [voter, setVoter] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -250,6 +251,7 @@ export const VoterDetailPage = () => {
                     {status === 'out_of_station' && (language === 'en' ? 'Out of Station' : 'സ്റ്റേഷനു പുറത്ത്')}
                     {status === 'deceased' && (language === 'en' ? 'Deceased' : 'മരണപ്പെട്ടു')}
                     {status === 'postal_vote' && (language === 'en' ? 'Postal Vote' : 'തപാൽ വോട്ട്')}
+                    {status === 'deleted' && (language === 'en' ? 'Deleted' : 'ഇല്ലാതാക്കി')}
                   </p>
                 </div>
 
@@ -259,10 +261,10 @@ export const VoterDetailPage = () => {
                     {language === 'en' ? 'Division' : 'ഡിവിഷൻ'}
                   </label>
                   <p className="text-base font-medium">
-                    {party === 'ldf' && 'Division A'}
-                    {party === 'udf' && 'Division B'}
-                    {party === 'bjp' && 'Division C'}
-                    {party === 'other' && 'Division D'}
+                    {party === 'ldf' && (isOverview ? 'Division L' : 'Division A')}
+                    {party === 'udf' && (isOverview ? 'Division U' : 'Division B')}
+                    {party === 'bjp' && (isOverview ? 'Division B' : 'Division C')}
+                    {party === 'other' && (isOverview ? 'Division O' : 'Division D')}
                     {party === 'unknown' && '-'}
                   </p>
                 </div>
@@ -328,6 +330,7 @@ export const VoterDetailPage = () => {
                     <option value="out_of_station">{language === 'en' ? 'Out of Station' : 'സ്റ്റേഷനു പുറത്ത്'}</option>
                     <option value="deceased">{language === 'en' ? 'Deceased' : 'മരണപ്പെട്ടു'}</option>
                     <option value="postal_vote">{language === 'en' ? 'Postal Vote' : 'തപാൽ വോട്ട്'}</option>
+                    <option value="deleted">{language === 'en' ? 'Deleted' : 'ഇല്ലാതാക്കി'}</option>
                   </select>
                 </div>
 

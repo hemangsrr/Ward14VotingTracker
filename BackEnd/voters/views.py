@@ -70,6 +70,10 @@ def current_user_view(request):
     else:
         data['volunteer'] = None
     
+    # Overview users are read-only
+    if user.role == 'overview':
+        data['is_read_only'] = True
+    
     return Response(data)
 
 
@@ -127,6 +131,7 @@ class VoterViewSet(viewsets.ModelViewSet):
         """
         Level 1 volunteers can only view (list, retrieve)
         Level 2 volunteers can view and edit (list, retrieve, update, partial_update)
+        Overview users can only view (read-only)
         Admin can do everything
         """
         if self.action in ['update', 'partial_update', 'destroy']:
@@ -140,8 +145,13 @@ class VoterViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
     
     def update(self, request, *args, **kwargs):
-        """Override update to prevent Level 1 from editing"""
+        """Override update to prevent Level 1 and Overview users from editing"""
         user = request.user
+        if user.role == 'overview':
+            return Response(
+                {'detail': 'Overview users have read-only access.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
         if hasattr(user, 'volunteer_profile'):
             volunteer = user.volunteer_profile
             if volunteer.level == 'level1':
@@ -152,8 +162,13 @@ class VoterViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
     
     def partial_update(self, request, *args, **kwargs):
-        """Override partial_update to prevent Level 1 from editing"""
+        """Override partial_update to prevent Level 1 and Overview users from editing"""
         user = request.user
+        if user.role == 'overview':
+            return Response(
+                {'detail': 'Overview users have read-only access.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
         if hasattr(user, 'volunteer_profile'):
             volunteer = user.volunteer_profile
             if volunteer.level == 'level1':
@@ -317,15 +332,17 @@ class VolunteerViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def dashboard_stats(request):
-    """Get overall dashboard statistics - Admin only"""
-    # Only admin can access dashboard
-    if request.user.role != 'admin':
+    """Get overall dashboard statistics - Admin and Overview users only"""
+    # Only admin and overview users can access dashboard
+    if request.user.role not in ['admin', 'overview']:
         return Response(
-            {'detail': 'Dashboard is only accessible to administrators.'},
+            {'detail': 'Dashboard is only accessible to administrators and overview users.'},
             status=status.HTTP_403_FORBIDDEN
         )
-    total_voters = Voter.objects.count()
-    voted_count = Voter.objects.filter(has_voted=True).count()
+    # Exclude deleted voters from all counts
+    active_voters = Voter.objects.exclude(status='deleted')
+    total_voters = active_voters.count()
+    voted_count = active_voters.filter(has_voted=True).count()
     not_voted_count = total_voters - voted_count
     voting_percentage = round((voted_count / total_voters * 100) if total_voters > 0 else 0, 2)
     
@@ -338,45 +355,66 @@ def dashboard_stats(request):
             'voted_count': count
         }
     
-    # Status-wise stats
+    # Status-wise stats (exclude deleted from display)
     status_stats = {}
     for status_code, status_name in Voter.STATUS_CHOICES:
-        count = Voter.objects.filter(status=status_code).count()
-        status_stats[status_code] = {
-            'name': status_name,
-            'count': count
-        }
+        if status_code != 'deleted':  # Don't show deleted in status stats
+            count = Voter.objects.filter(status=status_code).count()
+            status_stats[status_code] = {
+                'name': status_name,
+                'count': count
+            }
     
     # Level 1 volunteer stats
     level1_volunteers = Volunteer.objects.filter(level='level1', is_active=True)
     level1_stats = []
     for volunteer in level1_volunteers:
-        voters = Voter.objects.filter(level1_volunteer=volunteer)
+        # Exclude deleted voters
+        voters = Voter.objects.filter(level1_volunteer=volunteer).exclude(status='deleted')
         total = voters.count()
         voted = voters.filter(has_voted=True).count()
+        
+        # LDF specific stats
+        ldf_voters = voters.filter(party='ldf')
+        ldf_total = ldf_voters.count()
+        ldf_voted = ldf_voters.filter(has_voted=True).count()
+        
         level1_stats.append({
             'id': volunteer.id,
             'name': volunteer.name,
             'total_voters': total,
             'voted_count': voted,
             'not_voted_count': total - voted,
-            'voting_percentage': round((voted / total * 100) if total > 0 else 0, 2)
+            'voting_percentage': round((voted / total * 100) if total > 0 else 0, 2),
+            'ldf_total': ldf_total,
+            'ldf_voted': ldf_voted,
+            'ldf_percentage': round((ldf_voted / ldf_total * 100) if ldf_total > 0 else 0, 2)
         })
     
     # Level 2 volunteer stats
     level2_volunteers = Volunteer.objects.filter(level='level2', is_active=True)
     level2_stats = []
     for volunteer in level2_volunteers:
-        voters = Voter.objects.filter(level2_volunteer=volunteer)
+        # Exclude deleted voters
+        voters = Voter.objects.filter(level2_volunteer=volunteer).exclude(status='deleted')
         total = voters.count()
         voted = voters.filter(has_voted=True).count()
+        
+        # LDF specific stats
+        ldf_voters = voters.filter(party='ldf')
+        ldf_total = ldf_voters.count()
+        ldf_voted = ldf_voters.filter(has_voted=True).count()
+        
         level2_stats.append({
             'id': volunteer.id,
             'name': volunteer.name,
             'total_voters': total,
             'voted_count': voted,
             'not_voted_count': total - voted,
-            'voting_percentage': round((voted / total * 100) if total > 0 else 0, 2)
+            'voting_percentage': round((voted / total * 100) if total > 0 else 0, 2),
+            'ldf_total': ldf_total,
+            'ldf_voted': ldf_voted,
+            'ldf_percentage': round((ldf_voted / ldf_total * 100) if ldf_total > 0 else 0, 2)
         })
     
     data = {

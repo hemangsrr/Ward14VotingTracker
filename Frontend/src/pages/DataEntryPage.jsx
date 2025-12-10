@@ -125,6 +125,9 @@ export const DataEntryPage = () => {
           postal_vote: language === 'en'
             ? `${voter.name_en} (S.No: ${voter.serial_no}) is marked as Postal Vote`
             : `${voter.name_ml || voter.name_en} (ക്രമ നം: ${voter.serial_no}) തപാൽ വോട്ട് എന്ന് അടയാളപ്പെടുത്തിയിട്ടുണ്ട്`,
+          deleted: language === 'en'
+            ? `${voter.name_en} (S.No: ${voter.serial_no}) is marked as Deleted`
+            : `${voter.name_ml || voter.name_en} (ക്രമ നം: ${voter.serial_no}) ഇല്ലാതാക്കി എന്ന് അടയാളപ്പെടുത്തിയിട്ടുണ്ട്`,
         };
         
         setMessage(statusMessages[voter.status] || (language === 'en'

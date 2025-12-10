@@ -50,20 +50,12 @@ export const DashboardPage = () => {
 
   if (!stats) return null;
 
-  // Prepare party data for pie chart
-  const partyData = Object.entries(stats.party_stats).map(([key, value]) => ({
-    name: value.name,
-    value: value.voted_count,
-  }));
-
   // Prepare volunteer data for bar chart
   const volunteerData = stats.level1_volunteer_stats.map(v => ({
     name: v.name,
     voted: v.voted_count,
     notVoted: v.not_voted_count,
   }));
-
-  const COLORS = ['#dc2626', '#ef4444', '#f87171', '#fca5a5', '#fecaca'];
 
   return (
     <div className="space-y-6">
@@ -132,47 +124,18 @@ export const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Party-wise Distribution */}
-        <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">
-            {language === 'en' ? 'Party-wise Votes' : 'പാർട്ടി അനുസരിച്ച് വോട്ടുകൾ'}
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={partyData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, value }) => `${name}: ${value}`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {partyData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Status Distribution */}
-        <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4">
-            {language === 'en' ? 'Voter Status' : 'വോട്ടർ സ്റ്റാറ്റസ്'}
-          </h2>
-          <div className="space-y-3">
-            {Object.entries(stats.status_stats).map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between">
-                <span className="text-sm font-medium">{value.name}</span>
-                <span className="text-sm text-muted-foreground">{value.count}</span>
-              </div>
-            ))}
-          </div>
+      {/* Status Distribution */}
+      <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
+        <h2 className="text-xl font-semibold mb-4">
+          {language === 'en' ? 'Voter Status Distribution' : 'വോട്ടർ സ്റ്റാറ്റസ് വിതരണം'}
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Object.entries(stats.status_stats).map(([key, value]) => (
+            <div key={key} className="bg-accent/30 rounded-lg p-4 text-center">
+              <p className="text-2xl font-bold text-foreground">{value.count}</p>
+              <p className="text-sm text-muted-foreground mt-1">{value.name}</p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -200,10 +163,10 @@ export const DashboardPage = () => {
         )}
       </div>
 
-      {/* Volunteer Stats Table */}
+      {/* Level 1 Volunteer Stats Table */}
       <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
         <h2 className="text-xl font-semibold mb-4">
-          {language === 'en' ? 'Volunteer Statistics' : 'സന്നദ്ധപ്രവർത്തക സ്ഥിതിവിവരക്കണക്കുകൾ'}
+          {language === 'en' ? 'Level 1 Volunteer Statistics' : 'ലെവൽ 1 സന്നദ്ധപ്രവർത്തക സ്ഥിതിവിവരക്കണക്കുകൾ'}
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -213,15 +176,23 @@ export const DashboardPage = () => {
                   {language === 'en' ? 'Volunteer' : 'സന്നദ്ധപ്രവർത്തകൻ'}
                 </th>
                 <th className="text-right py-3 px-4 font-semibold">
-                  {language === 'en' ? 'Total' : 'ആകെ'}
+                  {language === 'en' ? 'Total Voters' : 'ആകെ വോട്ടർമാർ'}
                 </th>
                 <th className="text-right py-3 px-4 font-semibold">
-                  {language === 'en' ? 'Voted' : 'വോട്ട് ചെയ്തവർ'}
+                  {language === 'en' ? 'LDF Voters' : 'LDF വോട്ടർമാർ'}
                 </th>
                 <th className="text-right py-3 px-4 font-semibold">
-                  {language === 'en' ? 'Pending' : 'ബാക്കിയുള്ളവർ'}
+                  {language === 'en' ? 'Total Voted' : 'ആകെ വോട്ട് ചെയ്തവർ'}
                 </th>
-                <th className="text-right py-3 px-4 font-semibold">%</th>
+                <th className="text-right py-3 px-4 font-semibold">
+                  {language === 'en' ? 'LDF Voted' : 'LDF വോട്ട് ചെയ്തവർ'}
+                </th>
+                <th className="text-right py-3 px-4 font-semibold">
+                  {language === 'en' ? 'Total %' : 'ആകെ %'}
+                </th>
+                <th className="text-right py-3 px-4 font-semibold">
+                  {language === 'en' ? 'LDF %' : 'LDF %'}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -229,11 +200,70 @@ export const DashboardPage = () => {
                 <tr key={volunteer.id} className="border-b border-border hover:bg-accent/50">
                   <td className="py-3 px-4">{volunteer.name}</td>
                   <td className="text-right py-3 px-4">{volunteer.total_voters}</td>
+                  <td className="text-right py-3 px-4 text-red-600">{volunteer.ldf_total}</td>
                   <td className="text-right py-3 px-4 text-green-600">{volunteer.voted_count}</td>
-                  <td className="text-right py-3 px-4 text-orange-600">{volunteer.not_voted_count}</td>
+                  <td className="text-right py-3 px-4 text-green-700 font-medium">{volunteer.ldf_voted}</td>
                   <td className="text-right py-3 px-4 font-semibold">{volunteer.voting_percentage}%</td>
+                  <td className="text-right py-3 px-4 font-semibold text-red-600">{volunteer.ldf_percentage}%</td>
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Level 2 Volunteer Stats Table */}
+      <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
+        <h2 className="text-xl font-semibold mb-4">
+          {language === 'en' ? 'Level 2 Volunteer Statistics' : 'ലെവൽ 2 സന്നദ്ധപ്രവർത്തക സ്ഥിതിവിവരക്കണക്കുകൾ'}
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left py-3 px-4 font-semibold">
+                  {language === 'en' ? 'Volunteer' : 'സന്നദ്ധപ്രവർത്തകൻ'}
+                </th>
+                <th className="text-right py-3 px-4 font-semibold">
+                  {language === 'en' ? 'Total Voters' : 'ആകെ വോട്ടർമാർ'}
+                </th>
+                <th className="text-right py-3 px-4 font-semibold">
+                  {language === 'en' ? 'LDF Voters' : 'LDF വോട്ടർമാർ'}
+                </th>
+                <th className="text-right py-3 px-4 font-semibold">
+                  {language === 'en' ? 'Total Voted' : 'ആകെ വോട്ട് ചെയ്തവർ'}
+                </th>
+                <th className="text-right py-3 px-4 font-semibold">
+                  {language === 'en' ? 'LDF Voted' : 'LDF വോട്ട് ചെയ്തവർ'}
+                </th>
+                <th className="text-right py-3 px-4 font-semibold">
+                  {language === 'en' ? 'Total %' : 'ആകെ %'}
+                </th>
+                <th className="text-right py-3 px-4 font-semibold">
+                  {language === 'en' ? 'LDF %' : 'LDF %'}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.level2_volunteer_stats && stats.level2_volunteer_stats.length > 0 ? (
+                stats.level2_volunteer_stats.map((volunteer) => (
+                  <tr key={volunteer.id} className="border-b border-border hover:bg-accent/50">
+                    <td className="py-3 px-4">{volunteer.name}</td>
+                    <td className="text-right py-3 px-4">{volunteer.total_voters}</td>
+                    <td className="text-right py-3 px-4 text-red-600">{volunteer.ldf_total}</td>
+                    <td className="text-right py-3 px-4 text-green-600">{volunteer.voted_count}</td>
+                    <td className="text-right py-3 px-4 text-green-700 font-medium">{volunteer.ldf_voted}</td>
+                    <td className="text-right py-3 px-4 font-semibold">{volunteer.voting_percentage}%</td>
+                    <td className="text-right py-3 px-4 font-semibold text-red-600">{volunteer.ldf_percentage}%</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center py-4 text-muted-foreground">
+                    {language === 'en' ? 'No Level 2 volunteer data available' : 'ലെവൽ 2 സന്നദ്ധപ്രവർത്തക ഡാറ്റ ലഭ്യമല്ല'}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

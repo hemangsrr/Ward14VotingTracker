@@ -3,6 +3,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AdminRoute } from '@/components/AdminRoute';
+import { AdminOrOverviewRoute } from '@/components/AdminOrOverviewRoute';
 import { Layout } from '@/components/Layout';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
@@ -21,15 +22,15 @@ function App() {
             {/* Public routes */}
             <Route path="/login" element={<LoginPage />} />
 
-            {/* Admin-only routes */}
+            {/* Admin and Overview routes */}
             <Route
               path="/dashboard"
               element={
-                <AdminRoute>
+                <AdminOrOverviewRoute>
                   <Layout>
                     <DashboardPage />
                   </Layout>
-                </AdminRoute>
+                </AdminOrOverviewRoute>
               }
             />
             <Route
@@ -45,23 +46,25 @@ function App() {
             <Route
               path="/volunteers"
               element={
-                <AdminRoute>
+                <AdminOrOverviewRoute>
                   <Layout>
                     <VolunteersPage />
                   </Layout>
-                </AdminRoute>
+                </AdminOrOverviewRoute>
               }
             />
             <Route
               path="/volunteers/:id/voters"
               element={
-                <AdminRoute>
+                <AdminOrOverviewRoute>
                   <Layout>
                     <VolunteerVotersPage />
                   </Layout>
-                </AdminRoute>
+                </AdminOrOverviewRoute>
               }
             />
+
+            {/* Admin-only routes */}
 
             {/* Protected routes (all authenticated users) */}
             <Route

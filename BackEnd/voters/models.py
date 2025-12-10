@@ -7,6 +7,7 @@ class User(AbstractUser):
     """Custom user model with role-based access"""
     ROLE_CHOICES = [
         ('admin', 'Admin'),
+        ('overview', 'Overview User'),
         ('level1', 'Level 1 Volunteer'),
         ('level2', 'Level 2 Volunteer'),
     ]
@@ -86,6 +87,7 @@ class Voter(models.Model):
         ('out_of_station', 'Out of Station'),
         ('deceased', 'Deceased'),
         ('postal_vote', 'Postal Vote'),
+        ('deleted', 'Deleted'),
     ]
     
     PARTY_CHOICES = [
