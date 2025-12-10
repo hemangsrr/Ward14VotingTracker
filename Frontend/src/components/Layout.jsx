@@ -6,6 +6,8 @@ import { useState } from 'react';
 
 export const Layout = ({ children }) => {
   const { user, logout, isAdmin } = useAuth();
+  const isOverview = user?.role === 'overview';
+  const showNav = isAdmin || isOverview;
   const { language, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -50,13 +52,13 @@ export const Layout = ({ children }) => {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center">
-              <Link to={isAdmin ? "/dashboard" : "/voters"} className="text-xl font-bold text-primary">
+              <Link to={(isAdmin || isOverview) ? "/dashboard" : "/voters"} className="text-xl font-bold text-primary">
                 {language === 'en' ? 'Ward 14 Voting Tracker' : 'വാർഡ് 14 വോട്ടിംഗ് ട്രാക്കർ'}
               </Link>
             </div>
 
-            {/* Desktop Navigation - Only show for admin */}
-            {isAdmin && (
+            {/* Desktop Navigation - Show for admin and overview users */}
+            {showNav && (
               <nav className="hidden md:flex items-center space-x-6">
                 {navItems.map((item) => (
                   <Link
@@ -85,7 +87,7 @@ export const Layout = ({ children }) => {
               {/* User info */}
               <div className="hidden md:flex items-center space-x-2 text-sm">
                 <span className="text-muted-foreground">
-                  {user?.username} {isAdmin && '(Admin)'}
+                  {user?.username} {isAdmin && '(Admin)'} {isOverview && '(Overview)'}
                 </span>
               </div>
 
@@ -100,8 +102,8 @@ export const Layout = ({ children }) => {
                 </span>
               </button>
 
-              {/* Mobile menu button - Only show for admin */}
-              {isAdmin && (
+              {/* Mobile menu button - Show for admin and overview users */}
+              {showNav && (
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   className="md:hidden p-2 rounded-md hover:bg-accent"
@@ -129,7 +131,7 @@ export const Layout = ({ children }) => {
               ))}
               <div className="pt-2 border-t border-border">
                 <div className="px-3 py-2 text-sm text-muted-foreground">
-                  {user?.username} {isAdmin && '(Admin)'}
+                  {user?.username} {isAdmin && '(Admin)'} {isOverview && '(Overview)'}
                 </div>
               </div>
             </nav>

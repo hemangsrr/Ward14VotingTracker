@@ -261,8 +261,8 @@ class VolunteerViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'user__username']
-    ordering_fields = ['name', 'level', 'created_at']
-    ordering = ['level', 'name']
+    ordering_fields = ['volunteer_id', 'name', 'level', 'created_at']
+    ordering = ['volunteer_id']
     
     def get_queryset(self):
         queryset = Volunteer.objects.select_related('parent_volunteer', 'user')
