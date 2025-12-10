@@ -43,8 +43,8 @@ echo "Processing CSV and generating SQL updates..."
 PROCESSED=0
 SKIPPED=0
 
-# Read CSV line by line (skip header)
-tail -n +2 "$CSV_FILE" | while IFS=',' read -r vl_no thara_no || [ -n "$vl_no" ]; do
+# Read CSV line by line (skip header) - use process substitution to avoid subshell
+while IFS=',' read -r vl_no thara_no || [ -n "$vl_no" ]; do
     # Skip empty lines
     if [ -z "$vl_no" ]; then
         continue
@@ -80,7 +80,7 @@ WHERE serial_no = $vl_no;
 EOF
     
     ((PROCESSED++))
-done
+done < <(tail -n +2 "$CSV_FILE")
 
 echo "✓ Generated SQL for $PROCESSED records ($SKIPPED skipped due to missing Thara)"
 
