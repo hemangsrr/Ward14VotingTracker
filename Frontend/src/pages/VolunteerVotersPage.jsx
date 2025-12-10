@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { volunteersAPI } from '@/services/api';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 
 export const VolunteerVotersPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { user, isAdmin } = useAuth();
+  const isOverview = user?.role === 'overview';
   
   const [volunteer, setVolunteer] = useState(null);
   const [voters, setVoters] = useState([]);
@@ -69,6 +72,18 @@ export const VolunteerVotersPage = () => {
     );
   };
 
+  // Division mapping for overview users
+  const getDivisionLabel = (partyCode) => {
+    const divisionMap = {
+      'ldf': 'L',
+      'udf': 'U',
+      'bjp': 'B',
+      'other': 'O',
+      'unknown': '-'
+    };
+    return divisionMap[partyCode] || partyCode;
+  };
+
   const getPartyBadge = (party) => {
     const partyColors = {
       ldf: 'bg-red-100 text-red-800',
@@ -78,9 +93,12 @@ export const VolunteerVotersPage = () => {
       unknown: 'bg-gray-50 text-gray-600',
     };
     
+    // Show division for overview users, party for admin
+    const label = isOverview ? getDivisionLabel(party) : party.toUpperCase();
+    
     return (
       <span className={`px-2 py-1 rounded text-xs font-medium ${partyColors[party] || 'bg-gray-100 text-gray-800'}`}>
-        {party.toUpperCase()}
+        {label}
       </span>
     );
   };
@@ -225,7 +243,10 @@ export const VolunteerVotersPage = () => {
                     {language === 'en' ? 'Age' : 'പ്രായം'}
                   </th>
                   <th className="text-center py-3 px-4 font-semibold">
-                    {language === 'en' ? 'Party' : 'പാർട്ടി'}
+                    {isAdmin 
+                      ? (language === 'en' ? 'Party' : 'പാർട്ടി')
+                      : (language === 'en' ? 'Division' : 'ഡിവിഷൻ')
+                    }
                   </th>
                   <th className="text-center py-3 px-4 font-semibold">
                     {language === 'en' ? 'Status' : 'സ്റ്റാറ്റസ്'}
