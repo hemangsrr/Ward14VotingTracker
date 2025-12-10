@@ -26,9 +26,20 @@ export const generateVotingStatusPDF = (voters, stats, ldfOnly = false, language
     : voters;
 
   // Calculate statistics
-  const totalVoters = ldfOnly ? stats.party_stats?.ldf?.total || 0 : stats.total_voters;
-  const votedCount = filteredVoters.length;
-  const percentage = totalVoters > 0 ? ((votedCount / totalVoters) * 100).toFixed(2) : 0;
+  let totalVoters, votedCount, percentage;
+  
+  if (ldfOnly) {
+    // For LDF: get total from party_stats
+    const ldfStats = stats.party_stats?.ldf;
+    totalVoters = ldfStats?.total || 0;
+    votedCount = filteredVoters.length;
+    percentage = totalVoters > 0 ? ((votedCount / totalVoters) * 100).toFixed(2) : 0;
+  } else {
+    // For all voters
+    totalVoters = stats.total_voters;
+    votedCount = filteredVoters.length;
+    percentage = totalVoters > 0 ? ((votedCount / totalVoters) * 100).toFixed(2) : 0;
+  }
 
   // Title
   const title = ldfOnly 
@@ -63,12 +74,19 @@ export const generateVotingStatusPDF = (voters, stats, ldfOnly = false, language
   const tableData = filteredVoters.map((voter, index) => {
     // Determine Thara (1-5) based on level2_volunteer
     let thara = '-';
+    
+    // Try level2_volunteer_name first
     if (voter.level2_volunteer_name) {
-      // Extract number from volunteer name (e.g., "TH-01" -> "1")
       const match = voter.level2_volunteer_name.match(/(\d+)/);
       if (match) {
         thara = match[1];
       }
+    }
+    // Fallback: try to extract from level2_volunteer ID if available
+    else if (voter.level2_volunteer) {
+      // If level2_volunteer is a number (ID), map it to Thara number
+      // Assuming volunteer IDs map to Thara numbers (adjust if needed)
+      thara = voter.level2_volunteer.toString();
     }
 
     // Format time voted

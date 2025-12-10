@@ -42,6 +42,12 @@ export const DashboardPage = () => {
       
       const votedVoters = response.data.results || response.data;
       
+      // Debug: Log first voter to check available fields
+      if (votedVoters.length > 0) {
+        console.log('Sample voter data:', votedVoters[0]);
+        console.log('Stats data:', stats);
+      }
+      
       // Generate PDF
       generateVotingStatusPDF(votedVoters, stats, ldfOnly, language);
       
