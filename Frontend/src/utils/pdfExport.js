@@ -29,9 +29,14 @@ export const generateVotingStatusPDF = (voters, stats, ldfOnly = false, language
   let totalVoters, votedCount, percentage;
   
   if (ldfOnly) {
-    // For LDF: get total from party_stats
-    const ldfStats = stats.party_stats?.ldf;
-    totalVoters = ldfStats?.total || 0;
+    // For LDF: Sum up LDF voters from all Thara secretaries (level2_volunteer_stats)
+    totalVoters = 0;
+    if (stats.level2_volunteer_stats && Array.isArray(stats.level2_volunteer_stats)) {
+      totalVoters = stats.level2_volunteer_stats.reduce((sum, volunteer) => {
+        return sum + (volunteer.ldf_total || 0);
+      }, 0);
+    }
+    
     votedCount = filteredVoters.length;
     percentage = totalVoters > 0 ? ((votedCount / totalVoters) * 100).toFixed(2) : 0;
   } else {
@@ -72,20 +77,13 @@ export const generateVotingStatusPDF = (voters, stats, ldfOnly = false, language
 
   // Prepare table data
   const tableData = filteredVoters.map((voter, index) => {
-    // Determine Thara (1-5) based on level2_volunteer
+    // Determine Thara (1-5) based on level2_volunteer ID
+    // The level2_volunteer field contains the volunteer ID which corresponds to Thara number
     let thara = '-';
     
-    // Try level2_volunteer_name first
-    if (voter.level2_volunteer_name) {
-      const match = voter.level2_volunteer_name.match(/(\d+)/);
-      if (match) {
-        thara = match[1];
-      }
-    }
-    // Fallback: try to extract from level2_volunteer ID if available
-    else if (voter.level2_volunteer) {
-      // If level2_volunteer is a number (ID), map it to Thara number
-      // Assuming volunteer IDs map to Thara numbers (adjust if needed)
+    if (voter.level2_volunteer) {
+      // Map volunteer ID to Thara number
+      // Assuming IDs 1-5 map to Thara 1-5
       thara = voter.level2_volunteer.toString();
     }
 
