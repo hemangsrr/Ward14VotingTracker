@@ -291,6 +291,15 @@ export const VoterDetailPage = () => {
                       </>
                     )}
                   </div>
+                  {voter.time_voted && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {language === 'en' ? 'Time: ' : 'സമയം: '}
+                      {new Date(voter.time_voted).toLocaleString(language === 'en' ? 'en-IN' : 'ml-IN', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short'
+                      })}
+                    </p>
+                  )}
                 </div>
 
                 {/* Phone Number - Read Only */}
@@ -389,6 +398,15 @@ export const VoterDetailPage = () => {
                   {!votingEnabled && (
                     <p className="text-xs text-muted-foreground mt-1">
                       {language === 'en' ? 'Voting is currently disabled. Admin must enable it from settings.' : 'വോട്ടിംഗ് നിലവിൽ പ്രവർത്തനരഹിതമാണ്. അഡ്മിൻ ക്രമീകരണങ്ങളിൽ നിന്ന് ഇത് പ്രവർത്തനക്ഷമമാക്കണം.'}
+                    </p>
+                  )}
+                  {voter.time_voted && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {language === 'en' ? 'Voted at: ' : 'വോട്ട് ചെയ്ത സമയം: '}
+                      {new Date(voter.time_voted).toLocaleString(language === 'en' ? 'en-IN' : 'ml-IN', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short'
+                      })}
                     </p>
                   )}
                 </div>

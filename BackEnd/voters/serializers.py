@@ -45,7 +45,7 @@ class VoterListSerializer(serializers.ModelSerializer):
             'house_name_en', 'house_name_ml', 'sec_id',
             'level1_volunteer', 'level1_volunteer_name',
             'level2_volunteer', 'level2_volunteer_name',
-            'status', 'party', 'has_voted', 'phone_number'
+            'status', 'party', 'has_voted', 'time_voted', 'phone_number'
         ]
 
 
@@ -64,7 +64,7 @@ class VoterDetailSerializer(serializers.ModelSerializer):
             'old_ward_house_no', 'gender', 'age',
             'level1_volunteer', 'level1_volunteer_name',
             'level2_volunteer', 'level2_volunteer_name',
-            'status', 'party', 'has_voted', 'phone_number',
+            'status', 'party', 'has_voted', 'time_voted', 'phone_number',
             'notes', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'serial_no', 'sec_id', 'created_at', 'updated_at']
@@ -74,7 +74,7 @@ class VoterUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating voter tracking fields"""
     class Meta:
         model = Voter
-        fields = ['status', 'party', 'has_voted', 'phone_number', 'notes', 
+        fields = ['status', 'party', 'has_voted', 'time_voted', 'phone_number', 'notes', 
                   'level1_volunteer', 'level2_volunteer']
 
 

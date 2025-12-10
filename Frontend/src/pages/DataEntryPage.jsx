@@ -141,9 +141,10 @@ export const DataEntryPage = () => {
       }
 
       // Mark as voted
-      await votersAPI.update(voter.id, { has_voted: true });
+      const updateResponse = await votersAPI.update(voter.id, { has_voted: true });
+      const updatedVoter = updateResponse.data;
 
-      // Add to marked voters list (at the top)
+      // Add to marked voters list (at the top) with server timestamp
       setMarkedVoters(prev => [{
         id: voter.id,
         serial_no: voter.serial_no,
@@ -151,7 +152,10 @@ export const DataEntryPage = () => {
         name_ml: voter.name_ml,
         house_name_en: voter.house_name_en,
         house_name_ml: voter.house_name_ml,
-        timestamp: new Date().toLocaleTimeString(),
+        time_voted: updatedVoter.time_voted,
+        timestamp: updatedVoter.time_voted 
+          ? new Date(updatedVoter.time_voted).toLocaleTimeString()
+          : new Date().toLocaleTimeString(),
       }, ...prev]);
 
       setMessage(language === 'en'

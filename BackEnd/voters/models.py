@@ -145,6 +145,7 @@ class Voter(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     party = models.CharField(max_length=20, choices=PARTY_CHOICES, default='unknown')
     has_voted = models.BooleanField(default=False, verbose_name="Voted")
+    time_voted = models.DateTimeField(null=True, blank=True, verbose_name="Time Voted", help_text="Timestamp when voter was marked as voted")
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     
     # Metadata

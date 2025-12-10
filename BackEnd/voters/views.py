@@ -178,6 +178,26 @@ class VoterViewSet(viewsets.ModelViewSet):
                 )
         return super().partial_update(request, *args, **kwargs)
     
+    def perform_update(self, serializer):
+        """Automatically set time_voted when has_voted is changed to True"""
+        from django.utils import timezone
+        
+        # Get the instance being updated
+        instance = serializer.instance
+        
+        # Check if has_voted is being set to True
+        if 'has_voted' in serializer.validated_data:
+            new_has_voted = serializer.validated_data['has_voted']
+            
+            # If changing from False to True, set time_voted to now
+            if new_has_voted and not instance.has_voted:
+                serializer.validated_data['time_voted'] = timezone.now()
+            # If changing from True to False, clear time_voted
+            elif not new_has_voted and instance.has_voted:
+                serializer.validated_data['time_voted'] = None
+        
+        serializer.save()
+    
     def get_queryset(self):
         queryset = Voter.objects.select_related('level1_volunteer', 'level2_volunteer')
         user = self.request.user
