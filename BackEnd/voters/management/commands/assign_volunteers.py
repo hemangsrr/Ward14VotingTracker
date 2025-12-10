@@ -50,14 +50,18 @@ class Command(BaseCommand):
 
         self.stdout.write(f'Found {len(thara_mapping)} voter-to-thara mappings')
 
-        # Get all level 2 volunteers
+        # Get unique thara numbers from the mapping
+        unique_tharas = set(thara_mapping.values())
+        self.stdout.write(f'Unique Thara numbers in CSV: {sorted(unique_tharas)}')
+
+        # Get all level 2 volunteers that are actually needed
         level2_volunteers = {}
-        for i in range(1, 10):  # Assuming th01 to th09
-            username = f'th{i:02d}'
+        for thara_no in sorted(unique_tharas):
+            username = f'th{thara_no:02d}'
             try:
                 user = User.objects.get(username=username)
                 volunteer = Volunteer.objects.get(user=user, level='level2')
-                level2_volunteers[i] = volunteer
+                level2_volunteers[thara_no] = volunteer
                 self.stdout.write(f'  Found volunteer: {username} - {volunteer.name}')
             except (User.DoesNotExist, Volunteer.DoesNotExist):
                 self.stdout.write(self.style.WARNING(f'  Volunteer {username} not found'))
