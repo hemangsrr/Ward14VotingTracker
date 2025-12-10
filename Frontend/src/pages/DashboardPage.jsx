@@ -166,7 +166,7 @@ export const DashboardPage = () => {
       {/* Level 1 Volunteer Stats Table */}
       <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
         <h2 className="text-xl font-semibold mb-4">
-          {language === 'en' ? 'Level 1 Volunteer Statistics' : 'ലെവൽ 1 സന്നദ്ധപ്രവർത്തക സ്ഥിതിവിവരക്കണക്കുകൾ'}
+          {language === 'en' ? 'Level 1 Volunteer Statistics (LDF Only)' : 'ലെവൽ 1 സന്നദ്ധപ്രവർത്തക സ്ഥിതിവിവരക്കണക്കുകൾ (LDF മാത്രം)'}
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -179,19 +179,10 @@ export const DashboardPage = () => {
                   {language === 'en' ? 'Total Voters' : 'ആകെ വോട്ടർമാർ'}
                 </th>
                 <th className="text-right py-3 px-4 font-semibold">
-                  {language === 'en' ? 'LDF Voters' : 'LDF വോട്ടർമാർ'}
+                  {language === 'en' ? 'Voted' : 'വോട്ട് ചെയ്തവർ'}
                 </th>
                 <th className="text-right py-3 px-4 font-semibold">
-                  {language === 'en' ? 'Total Voted' : 'ആകെ വോട്ട് ചെയ്തവർ'}
-                </th>
-                <th className="text-right py-3 px-4 font-semibold">
-                  {language === 'en' ? 'LDF Voted' : 'LDF വോട്ട് ചെയ്തവർ'}
-                </th>
-                <th className="text-right py-3 px-4 font-semibold">
-                  {language === 'en' ? 'Total %' : 'ആകെ %'}
-                </th>
-                <th className="text-right py-3 px-4 font-semibold">
-                  {language === 'en' ? 'LDF %' : 'LDF %'}
+                  {language === 'en' ? 'Percentage' : 'ശതമാനം'}
                 </th>
               </tr>
             </thead>
@@ -200,11 +191,8 @@ export const DashboardPage = () => {
                 <tr key={volunteer.id} className="border-b border-border hover:bg-accent/50">
                   <td className="py-3 px-4">{volunteer.name}</td>
                   <td className="text-right py-3 px-4">{volunteer.total_voters}</td>
-                  <td className="text-right py-3 px-4 text-red-600">{volunteer.ldf_total}</td>
-                  <td className="text-right py-3 px-4 text-green-600">{volunteer.voted_count}</td>
-                  <td className="text-right py-3 px-4 text-green-700 font-medium">{volunteer.ldf_voted}</td>
-                  <td className="text-right py-3 px-4 font-semibold">{volunteer.voting_percentage}%</td>
-                  <td className="text-right py-3 px-4 font-semibold text-red-600">{volunteer.ldf_percentage}%</td>
+                  <td className="text-right py-3 px-4 text-green-600 font-medium">{volunteer.voted_count}</td>
+                  <td className="text-right py-3 px-4 font-semibold text-primary">{volunteer.voting_percentage}%</td>
                 </tr>
               ))}
             </tbody>
