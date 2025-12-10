@@ -142,7 +142,7 @@ export const DashboardPage = () => {
       {/* Level 1 Volunteers Progress */}
       <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
         <h2 className="text-xl font-semibold mb-4">
-          {language === 'en' ? 'Level 1 Volunteer Progress' : 'ലെവൽ 1 സന്നദ്ധപ്രവർത്തകരുടെ പുരോഗതി'}
+          {language === 'en' ? 'Volunteer Progress' : 'സന്നദ്ധപ്രവർത്തകരുടെ പുരോഗതി'}
         </h2>
         {volunteerData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
@@ -166,7 +166,7 @@ export const DashboardPage = () => {
       {/* Level 1 Volunteer Stats Table */}
       <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
         <h2 className="text-xl font-semibold mb-4">
-          {language === 'en' ? 'Level 1 Volunteer Statistics (LDF Only)' : 'ലെവൽ 1 സന്നദ്ധപ്രവർത്തക സ്ഥിതിവിവരക്കണക്കുകൾ (LDF മാത്രം)'}
+          {language === 'en' ? 'Volunteer Statistics' : 'സന്നദ്ധപ്രവർത്തക സ്ഥിതിവിവരക്കണക്കുകൾ'}
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -203,14 +203,14 @@ export const DashboardPage = () => {
       {/* Level 2 Volunteer Stats Table */}
       <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
         <h2 className="text-xl font-semibold mb-4">
-          {language === 'en' ? 'Level 2 Volunteer Statistics' : 'ലെവൽ 2 സന്നദ്ധപ്രവർത്തക സ്ഥിതിവിവരക്കണക്കുകൾ'}
+          {language === 'en' ? 'Thara Statistics' : 'തറ സ്ഥിതിവിവരക്കണക്കുകൾ'}
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left py-3 px-4 font-semibold">
-                  {language === 'en' ? 'Volunteer' : 'സന്നദ്ധപ്രവർത്തകൻ'}
+                  {language === 'en' ? 'Secretary' : 'സെക്രട്ടറി'}
                 </th>
                 <th className="text-right py-3 px-4 font-semibold">
                   {language === 'en' ? 'Total Voters' : 'ആകെ വോട്ടർമാർ'}
@@ -248,7 +248,7 @@ export const DashboardPage = () => {
               ) : (
                 <tr>
                   <td colSpan="7" className="text-center py-4 text-muted-foreground">
-                    {language === 'en' ? 'No Level 2 volunteer data available' : 'ലെവൽ 2 സന്നദ്ധപ്രവർത്തക ഡാറ്റ ലഭ്യമല്ല'}
+                    {language === 'en' ? 'No Thara data available' : 'തറ ഡാറ്റ ലഭ്യമല്ല'}
                   </td>
                 </tr>
               )}

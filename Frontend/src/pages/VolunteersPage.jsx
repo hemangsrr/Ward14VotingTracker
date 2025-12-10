@@ -56,7 +56,7 @@ export const VolunteersPage = () => {
               : 'bg-card border border-border hover:bg-accent'
           }`}
         >
-          {language === 'en' ? 'Level 1 Volunteers' : 'ലെവൽ 1 സന്നദ്ധപ്രവർത്തകർ'}
+          {language === 'en' ? 'Volunteers' : 'സന്നദ്ധപ്രവർത്തകർ'}
         </button>
         <button
           onClick={() => setSelectedLevel('level2')}
@@ -66,7 +66,7 @@ export const VolunteersPage = () => {
               : 'bg-card border border-border hover:bg-accent'
           }`}
         >
-          {language === 'en' ? 'Level 2 Volunteers' : 'ലെവൽ 2 സന്നദ്ധപ്രവർത്തകർ'}
+          {language === 'en' ? 'Thara' : 'തറ'}
         </button>
       </div>
 
