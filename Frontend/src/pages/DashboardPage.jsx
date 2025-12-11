@@ -276,6 +276,27 @@ export const DashboardPage = () => {
                 </tr>
               ))}
             </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-border bg-accent/30">
+                <td className="py-3 px-4 font-bold">
+                  {language === 'en' ? 'Total' : 'ആകെ'}
+                </td>
+                <td className="text-right py-3 px-4 font-bold">
+                  {stats.level1_volunteer_stats.reduce((sum, v) => sum + v.total_voters, 0)}
+                </td>
+                <td className="text-right py-3 px-4 font-bold text-green-600">
+                  {stats.level1_volunteer_stats.reduce((sum, v) => sum + v.voted_count, 0)}
+                </td>
+                <td className="text-right py-3 px-4 font-bold text-primary">
+                  {stats.level1_volunteer_stats.length > 0
+                    ? (
+                        (stats.level1_volunteer_stats.reduce((sum, v) => sum + v.voted_count, 0) /
+                        stats.level1_volunteer_stats.reduce((sum, v) => sum + v.total_voters, 0) * 100)
+                      ).toFixed(2)
+                    : 0}%
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>
@@ -341,6 +362,49 @@ export const DashboardPage = () => {
                 </tr>
               )}
             </tbody>
+            {stats.level2_volunteer_stats && stats.level2_volunteer_stats.length > 0 && (
+              <tfoot>
+                <tr className="border-t-2 border-border bg-accent/30">
+                  <td className="py-3 px-4 font-bold">
+                    {language === 'en' ? 'Total' : 'ആകെ'}
+                  </td>
+                  <td className="text-right py-3 px-4 font-bold">
+                    {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.total_voters, 0)}
+                  </td>
+                  <td className="text-right py-3 px-4 font-bold text-red-600">
+                    {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_total, 0)}
+                  </td>
+                  <td className="text-right py-3 px-4 font-bold text-green-600">
+                    {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.voted_count, 0)}
+                  </td>
+                  <td className="text-right py-3 px-4 font-bold text-green-700">
+                    {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_voted, 0)}
+                  </td>
+                  <td className="text-right py-3 px-4 font-bold text-blue-600 text-sm">
+                    {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_male_voted, 0)}
+                  </td>
+                  <td className="text-right py-3 px-4 font-bold text-pink-600 text-sm">
+                    {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_female_voted, 0)}
+                  </td>
+                  <td className="text-right py-3 px-4 font-bold">
+                    {stats.level2_volunteer_stats.length > 0
+                      ? (
+                          (stats.level2_volunteer_stats.reduce((sum, v) => sum + v.voted_count, 0) /
+                          stats.level2_volunteer_stats.reduce((sum, v) => sum + v.total_voters, 0) * 100)
+                        ).toFixed(2)
+                      : 0}%
+                  </td>
+                  <td className="text-right py-3 px-4 font-bold text-red-600">
+                    {stats.level2_volunteer_stats.length > 0
+                      ? (
+                          (stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_voted, 0) /
+                          stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_total, 0) * 100)
+                        ).toFixed(2)
+                      : 0}%
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </div>
