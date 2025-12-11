@@ -146,11 +146,15 @@ export const DashboardPage = () => {
         {/* Total Voters */}
         <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <p className="text-sm text-muted-foreground">
                 {language === 'en' ? 'Total Voters' : 'ആകെ വോട്ടർമാർ'}
               </p>
               <p className="text-3xl font-bold text-foreground mt-2">{stats.total_voters}</p>
+              <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+                <span>♂ {stats.male_total}</span>
+                <span>♀ {stats.female_total}</span>
+              </div>
             </div>
             <Users className="w-12 h-12 text-primary opacity-20" />
           </div>
@@ -159,11 +163,15 @@ export const DashboardPage = () => {
         {/* Voted */}
         <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <p className="text-sm text-muted-foreground">
                 {language === 'en' ? 'Voted' : 'വോട്ട് ചെയ്തവർ'}
               </p>
               <p className="text-3xl font-bold text-green-600 mt-2">{stats.voted_count}</p>
+              <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+                <span>♂ {stats.male_voted}</span>
+                <span>♀ {stats.female_voted}</span>
+              </div>
             </div>
             <CheckCircle className="w-12 h-12 text-green-600 opacity-20" />
           </div>
@@ -296,6 +304,12 @@ export const DashboardPage = () => {
                 <th className="text-right py-3 px-4 font-semibold">
                   {language === 'en' ? 'LDF Voted' : 'LDF വോട്ട് ചെയ്തവർ'}
                 </th>
+                <th className="text-right py-3 px-4 font-semibold text-xs">
+                  {language === 'en' ? 'LDF ♂' : 'LDF ♂'}
+                </th>
+                <th className="text-right py-3 px-4 font-semibold text-xs">
+                  {language === 'en' ? 'LDF ♀' : 'LDF ♀'}
+                </th>
                 <th className="text-right py-3 px-4 font-semibold">
                   {language === 'en' ? 'Total %' : 'ആകെ %'}
                 </th>
@@ -313,13 +327,15 @@ export const DashboardPage = () => {
                     <td className="text-right py-3 px-4 text-red-600">{volunteer.ldf_total}</td>
                     <td className="text-right py-3 px-4 text-green-600">{volunteer.voted_count}</td>
                     <td className="text-right py-3 px-4 text-green-700 font-medium">{volunteer.ldf_voted}</td>
+                    <td className="text-right py-3 px-4 text-blue-600 text-sm">{volunteer.ldf_male_voted}</td>
+                    <td className="text-right py-3 px-4 text-pink-600 text-sm">{volunteer.ldf_female_voted}</td>
                     <td className="text-right py-3 px-4 font-semibold">{volunteer.voting_percentage}%</td>
                     <td className="text-right py-3 px-4 font-semibold text-red-600">{volunteer.ldf_percentage}%</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="text-center py-4 text-muted-foreground">
+                  <td colSpan="9" className="text-center py-4 text-muted-foreground">
                     {language === 'en' ? 'No Thara data available' : 'തറ ഡാറ്റ ലഭ്യമല്ല'}
                   </td>
                 </tr>

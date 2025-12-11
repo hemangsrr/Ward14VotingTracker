@@ -366,6 +366,12 @@ def dashboard_stats(request):
     not_voted_count = total_voters - voted_count
     voting_percentage = round((voted_count / total_voters * 100) if total_voters > 0 else 0, 2)
     
+    # Gender breakdown for all voters
+    male_total = active_voters.filter(gender='M').count()
+    female_total = active_voters.filter(gender='F').count()
+    male_voted = active_voters.filter(gender='M', has_voted=True).count()
+    female_voted = active_voters.filter(gender='F', has_voted=True).count()
+    
     # Party-wise stats
     party_stats = {}
     for party_code, party_name in Voter.PARTY_CHOICES:
@@ -399,6 +405,10 @@ def dashboard_stats(request):
         ldf_total = ldf_voters.count()
         ldf_voted = ldf_voters.filter(has_voted=True).count()
         
+        # LDF gender breakdown
+        ldf_male_voted = ldf_voters.filter(gender='M', has_voted=True).count()
+        ldf_female_voted = ldf_voters.filter(gender='F', has_voted=True).count()
+        
         level1_stats.append({
             'id': volunteer.id,
             'name': volunteer.name,
@@ -408,7 +418,9 @@ def dashboard_stats(request):
             'voting_percentage': round((voted / total * 100) if total > 0 else 0, 2),
             'ldf_total': ldf_total,
             'ldf_voted': ldf_voted,
-            'ldf_percentage': round((ldf_voted / ldf_total * 100) if ldf_total > 0 else 0, 2)
+            'ldf_percentage': round((ldf_voted / ldf_total * 100) if ldf_total > 0 else 0, 2),
+            'ldf_male_voted': ldf_male_voted,
+            'ldf_female_voted': ldf_female_voted
         })
     
     # Level 2 volunteer stats
@@ -425,6 +437,10 @@ def dashboard_stats(request):
         ldf_total = ldf_voters.count()
         ldf_voted = ldf_voters.filter(has_voted=True).count()
         
+        # LDF gender breakdown
+        ldf_male_voted = ldf_voters.filter(gender='M', has_voted=True).count()
+        ldf_female_voted = ldf_voters.filter(gender='F', has_voted=True).count()
+        
         level2_stats.append({
             'id': volunteer.id,
             'name': volunteer.name,
@@ -434,7 +450,9 @@ def dashboard_stats(request):
             'voting_percentage': round((voted / total * 100) if total > 0 else 0, 2),
             'ldf_total': ldf_total,
             'ldf_voted': ldf_voted,
-            'ldf_percentage': round((ldf_voted / ldf_total * 100) if ldf_total > 0 else 0, 2)
+            'ldf_percentage': round((ldf_voted / ldf_total * 100) if ldf_total > 0 else 0, 2),
+            'ldf_male_voted': ldf_male_voted,
+            'ldf_female_voted': ldf_female_voted
         })
     
     data = {
@@ -442,6 +460,10 @@ def dashboard_stats(request):
         'voted_count': voted_count,
         'not_voted_count': not_voted_count,
         'voting_percentage': voting_percentage,
+        'male_total': male_total,
+        'female_total': female_total,
+        'male_voted': male_voted,
+        'female_voted': female_voted,
         'party_stats': party_stats,
         'status_stats': status_stats,
         'level1_volunteer_stats': level1_stats,
