@@ -34,22 +34,33 @@ export const DashboardPage = () => {
     try {
       setExporting(true);
       
-      // Fetch all voted voters
-      const response = await votersAPI.getAll({ 
-        has_voted: true,
-        page_size: 10000 // Get all voted voters
-      });
+      // Fetch ALL voted voters by making multiple requests if needed
+      let allVotedVoters = [];
+      let page = 1;
+      let hasMore = true;
       
-      const votedVoters = response.data.results || response.data;
-      
-      // Debug: Log first voter to check available fields
-      if (votedVoters.length > 0) {
-        console.log('Sample voter data:', votedVoters[0]);
-        console.log('Stats data:', stats);
+      while (hasMore) {
+        const response = await votersAPI.getAll({ 
+          has_voted: true,
+          page: page,
+          page_size: 100 // Fetch 100 at a time
+        });
+        
+        const voters = response.data.results || response.data;
+        allVotedVoters = [...allVotedVoters, ...voters];
+        
+        // Check if there are more pages
+        if (response.data.next) {
+          page++;
+        } else {
+          hasMore = false;
+        }
       }
       
+      console.log(`Fetched ${allVotedVoters.length} voted voters`);
+      
       // Generate PDF
-      generateVotingStatusPDF(votedVoters, stats, ldfOnly, language);
+      generateVotingStatusPDF(allVotedVoters, stats, ldfOnly, language);
       
     } catch (err) {
       console.error('Export error:', err);
