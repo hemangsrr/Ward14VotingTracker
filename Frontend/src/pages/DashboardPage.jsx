@@ -419,9 +419,9 @@ export const DashboardPage = () => {
       {stats.level2_volunteer_stats && stats.level2_volunteer_stats.length > 0 && (
         <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
           <h2 className="text-xl font-semibold mb-4">
-            {language === 'en' ? 'LDF Voting Summary (Gender-wise)' : 'LDF വോട്ടിംഗ് സംഗ്രഹം (ലിംഗാടിസ്ഥാനത്തിൽ)'}
+            {language === 'en' ? 'LDF Voting Summary' : 'LDF വോട്ടിംഗ് സംഗ്രഹം'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Total LDF Voted */}
             <div className="bg-accent/30 rounded-lg p-6 text-center">
               <p className="text-sm text-muted-foreground mb-2">
@@ -464,6 +464,22 @@ export const DashboardPage = () => {
                   ? ((stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_female_voted, 0) /
                       stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_voted, 0) * 100).toFixed(1))
                   : 0}% {language === 'en' ? 'of LDF voted' : 'LDF വോട്ട് ചെയ്തവരിൽ'}
+              </p>
+            </div>
+
+            {/* LDF % of Total Polled */}
+            <div className="bg-green-50 dark:bg-green-950/30 rounded-lg p-6 text-center border border-green-200 dark:border-green-800">
+              <p className="text-sm text-muted-foreground mb-2">
+                {language === 'en' ? 'LDF % of Total Polled' : 'ആകെ വോട്ടിൽ LDF %'}
+              </p>
+              <p className="text-4xl font-bold text-green-600">
+                {stats.voted_count > 0
+                  ? ((stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_voted, 0) /
+                      stats.voted_count * 100).toFixed(1))
+                  : 0}%
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_voted, 0)} {language === 'en' ? 'out of' : '/'} {stats.voted_count} {language === 'en' ? 'total voted' : 'ആകെ വോട്ട്'}
               </p>
             </div>
           </div>
