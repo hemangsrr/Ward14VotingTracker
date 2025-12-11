@@ -85,6 +85,12 @@ class DashboardStatsSerializer(serializers.Serializer):
     not_voted_count = serializers.IntegerField()
     voting_percentage = serializers.FloatField()
     
+    # Gender breakdown
+    male_total = serializers.IntegerField()
+    female_total = serializers.IntegerField()
+    male_voted = serializers.IntegerField()
+    female_voted = serializers.IntegerField()
+    
     # Party-wise stats
     party_stats = serializers.DictField()
     

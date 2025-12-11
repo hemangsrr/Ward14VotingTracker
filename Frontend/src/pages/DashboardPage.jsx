@@ -16,6 +16,12 @@ export const DashboardPage = () => {
     fetchStats();
   }, []);
 
+  useEffect(() => {
+    if (stats) {
+      console.log('Dashboard stats:', stats);
+    }
+  }, [stats]);
+
   const fetchStats = async () => {
     try {
       setLoading(true);
@@ -408,6 +414,61 @@ export const DashboardPage = () => {
           </table>
         </div>
       </div>
+
+      {/* LDF Gender Summary */}
+      {stats.level2_volunteer_stats && stats.level2_volunteer_stats.length > 0 && (
+        <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
+          <h2 className="text-xl font-semibold mb-4">
+            {language === 'en' ? 'LDF Voting Summary (Gender-wise)' : 'LDF വോട്ടിംഗ് സംഗ്രഹം (ലിംഗാടിസ്ഥാനത്തിൽ)'}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Total LDF Voted */}
+            <div className="bg-accent/30 rounded-lg p-6 text-center">
+              <p className="text-sm text-muted-foreground mb-2">
+                {language === 'en' ? 'Total LDF Voted' : 'ആകെ LDF വോട്ട് ചെയ്തവർ'}
+              </p>
+              <p className="text-4xl font-bold text-red-600">
+                {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_voted, 0)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {language === 'en' ? 'out of' : 'ആകെയുള്ളത്'} {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_total, 0)}
+              </p>
+            </div>
+
+            {/* LDF Male Voted */}
+            <div className="bg-blue-50 dark:bg-blue-950/30 rounded-lg p-6 text-center border border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-muted-foreground mb-2">
+                {language === 'en' ? 'LDF Male Voted' : 'LDF പുരുഷന്മാർ വോട്ട് ചെയ്തത്'}
+              </p>
+              <p className="text-4xl font-bold text-blue-600">
+                ♂ {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_male_voted, 0)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_total, 0) > 0
+                  ? ((stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_male_voted, 0) /
+                      stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_voted, 0) * 100).toFixed(1))
+                  : 0}% {language === 'en' ? 'of LDF voted' : 'LDF വോട്ട് ചെയ്തവരിൽ'}
+              </p>
+            </div>
+
+            {/* LDF Female Voted */}
+            <div className="bg-pink-50 dark:bg-pink-950/30 rounded-lg p-6 text-center border border-pink-200 dark:border-pink-800">
+              <p className="text-sm text-muted-foreground mb-2">
+                {language === 'en' ? 'LDF Female Voted' : 'LDF സ്ത്രീകൾ വോട്ട് ചെയ്തത്'}
+              </p>
+              <p className="text-4xl font-bold text-pink-600">
+                ♀ {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_female_voted, 0)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_total, 0) > 0
+                  ? ((stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_female_voted, 0) /
+                      stats.level2_volunteer_stats.reduce((sum, v) => sum + v.ldf_voted, 0) * 100).toFixed(1))
+                  : 0}% {language === 'en' ? 'of LDF voted' : 'LDF വോട്ട് ചെയ്തവരിൽ'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
